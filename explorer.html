@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explore MCP Servers | MCP Nexus</title>
+    <style>
+      :root {
+        --primary: #5046e5;
+        --primary-dark: #3832a0;
+        --secondary: #06b6d4;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --bg: #ffffff;
+        --bg-alt: #f8fafc;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      }
+
+      body {
+        color: var(--text);
+        background-color: var(--bg-alt);
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      header {
+        padding: 1.25rem 0;
+        background-color: var(--bg);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .header-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .logo-icon {
+        margin-right: 0.75rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--primary);
+        color: white;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+      }
+
+      nav a {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      nav a:hover {
+        color: var(--primary);
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        border: 1px solid var(--primary);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+      }
+
+      .btn-outline {
+        background-color: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+
+      .btn-outline:hover {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .page-header {
+        padding: 2rem 0;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        color: white;
+        margin-bottom: 2rem;
+      }
+
+      .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .page-subtitle {
+        font-size: 1.125rem;
+        max-width: 700px;
+      }
+
+      /* Explorer Layout */
+      .explorer {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      /* Filters Sidebar */
+      .filters {
+        background-color: var(--bg);
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        height: fit-content;
+      }
+
+      .filters-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .filter-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .filter-label {
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+
+      .checkbox-list {
+        list-style: none;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        margin-right: 0.75rem;
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+      }
+
+      .checkbox-item label {
+        flex: 1;
+        cursor: pointer;
+      }
+
+      .checkbox-count {
+        color: var(--text-light);
+        font-size: 0.875rem;
+      }
+
+      .tag-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .tag-filter {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(80, 70, 229, 0.1);
+        color: var(--primary);
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .tag-filter:hover,
+      .tag-filter.active {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .reset-filters {
+        background-color: transparent;
+        color: var(--primary);
+        border: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+      }
+
+      .reset-filters svg {
+        margin-right: 0.5rem;
+      }
+
+      /* Search and Results */
+      .search-container {
+        margin-bottom: 1.5rem;
+      }
+
+      .search-box {
+        display: flex;
+        width: 100%;
+      }
+
+      .search-input {
+        flex-grow: 1;
+        padding: 0.75rem 1.25rem;
+        border: 1px solid #e2e8f0;
+        border-right: none;
+        border-radius: 0.375rem 0 0 0.375rem;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      .search-input:focus {
+        border-color: var(--primary);
+      }
+
+      .search-button {
+        padding: 0.75rem 1.25rem;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 0 0.375rem 0.375rem 0;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .search-button:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .results-count {
+        font-weight: 500;
+      }
+
+      .results-sort {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .results-sort-label {
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+
+      .results-sort-select {
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.25rem;
+        background-color: white;
+        outline: none;
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+
+      .server-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .server-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .server-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .server-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+        font-weight: bold;
+        font-size: 1.25rem;
+      }
+
+      .server-name {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: var(--text);
+        text-decoration: none;
+        margin-bottom: 0.25rem;
+      }
+
+      .server-provider {
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+
+      .server-metadata {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .server-tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        background: #f1f5f9;
+        color: var(--text-light);
+      }
+
+      .server-tag.type {
+        background-color: rgba(80, 70, 229, 0.1);
+        color: var(--primary);
+      }
+
+      .server-info {
+        margin-bottom: 1.5rem;
+        color: var(--text-light);
+        font-size: 0.875rem;
+        flex-grow: 1;
+      }
+
+      .server-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 1rem;
+      }
+
+      .server-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        font-size: 0.875rem;
+      }
+
+      .stat-value {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: var(--text);
+      }
+
+      .stat-label {
+        color: var(--text-light);
+      }
+
+      .server-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .server-connect {
+        color: var(--primary);
+        font-weight: 500;
+        text-decoration: none;
+      }
+
+      .verified-badge {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        color: var(--success);
+      }
+
+      .verified-badge svg {
+        margin-right: 0.25rem;
+      }
+
+      .pill-tabs {
+        display: flex;
+        background-color: #f1f5f9;
+        border-radius: 9999px;
+        padding: 0.25rem;
+        width: fit-content;
+        margin-bottom: 1.5rem;
+      }
+
+      .pill-tab {
+        padding: 0.5rem 1.25rem;
+        border-radius: 9999px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .pill-tab.active {
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .not-found {
+        background-color: white;
+        padding: 3rem;
+        text-align: center;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .not-found-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .not-found-text {
+        color: var(--text-light);
+        margin-bottom: 2rem;
+      }
+
+      .not-found-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background-color: rgba(80, 70, 229, 0.1);
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+      }
+
+      /* Pagination */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      .pagination-list {
+        display: flex;
+        list-style: none;
+        gap: 0.5rem;
+      }
+
+      .pagination-item {
+        display: flex;
+      }
+
+      .pagination-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background-color: var(--bg);
+        border: 1px solid #e2e8f0;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .pagination-link:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .pagination-link.active {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: white;
+      }
+
+      .pagination-ellipsis {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        color: var(--text-light);
+      }
+
+      /* Footer */
+      footer {
+        padding: 5rem 0;
+        background-color: var(--bg);
+        margin-top: 4rem;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 4rem;
+      }
+
+      .footer-logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        display: inline-block;
+      }
+
+      .footer-description {
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: var(--bg-alt);
+        color: var(--text);
+        transition: all 0.2s;
+      }
+
+      .social-link:hover {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .footer-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-links a {
+        color: var(--text-light);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .footer-links a:hover {
+        color: var(--primary);
+      }
+
+      .copyright {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        text-align: center;
+        color: var(--text-light);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .explorer {
+          grid-template-columns: 1fr;
+        }
+
+        .filters {
+          margin-bottom: 2rem;
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        nav ul {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container header-inner">
+        <a href="#" class="logo">
+          <div class="logo-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 10h-4V6"></path>
+              <path d="M14 10 21 3"></path>
+              <path d="M6 14h4v4"></path>
+              <path d="M10 14 3 21"></path>
+              <ellipse cx="12" cy="12" rx="10" ry="10"></ellipse>
+            </svg>
+          </div>
+          MCP Nexus
+        </a>
+        <nav>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Explore</a></li>
+            <li><a href="#">Registry</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Community</a></li>
+          </ul>
+        </nav>
+        <div class="nav-buttons">
+          <a href="#" class="btn btn-outline">Sign In</a>
+          <a href="#" class="btn btn-primary">Register MCP Server</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="page-header">
+      <div class="container">
+        <h1 class="page-title">Explore MCP Servers</h1>
+        <p class="page-subtitle">
+          Discover Agents, Resources, and Tools in the decentralized MCP
+          network.
+        </p>
+      </div>
+    </section>
+
+    <section class="main">
+      <div class="container">
+        <div class="pill-tabs">
+          <div class="pill-tab active">All Servers</div>
+          <div class="pill-tab">Agents</div>
+          <div class="pill-tab">Resources</div>
+          <div class="pill-tab">Tools</div>
+        </div>
+
+        <div class="explorer">
+          <aside class="filters">
+            <h2 class="filters-title">Filters</h2>
+
+            <div class="filter-group">
+              <label class="filter-label">Server Type</label>
+              <ul class="checkbox-list">
+                <li class="checkbox-item">
+                  <input type="checkbox" id="type-agent" checked />
+                  <label for="type-agent">Agent</label>
+                  <span class="checkbox-count">(235)</span>
+                </li>
+                <li class="checkbox-item">
+                  <input type="checkbox" id="type-resource" checked />
+                  <label for="type-resource">Resource</label>
+                  <span class="checkbox-count">(128)</span>
+                </li>
+                <li class="checkbox-item">
+                  <input type="checkbox" id="type-tool" checked />
+                  <label for="type-tool">Tool</label>
+                  <span class="checkbox-count">(187)</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Verification Status</label>
+              <ul class="checkbox-list">
+                <li class="checkbox-item">
+                  <input type="checkbox" id="verified-yes" checked />
+                  <label for="verified-yes">Verified</label>
+                  <span class="checkbox-count">(312)</span>
+                </li>
+                <li class="checkbox-item">
+                  <input type="checkbox" id="verified-no" checked />
+                  <label for="verified-no">Unverified</label>
+                  <span class="checkbox-count">(238)</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Categories</label>
+              <div class="tag-filters">
+                <div class="tag-filter active">AI</div>
+                <div class="tag-filter">Data Processing</div>
+                <div class="tag-filter">Content</div>
+                <div class="tag-filter">Finance</div>
+                <div class="tag-filter">Analytics</div>
+                <div class="tag-filter">Knowledge</div>
+                <div class="tag-filter">Vision</div>
+                <div class="tag-filter">NLP</div>
+                <div class="tag-filter">Security</div>
+                <div class="tag-filter">API</div>
+                <div class="tag-filter">Media</div>
+              </div>
+            </div>
+
+            <button class="reset-filters">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                ></path>
+                <path d="M3 3v5h5"></path>
+              </svg>
+              Reset all filters
+            </button>
+          </aside>
+
+          <div class="results">
+            <div class="search-container">
+              <div class="search-box">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search for MCP servers..."
+                />
+                <button class="search-button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="results-header">
+              <div class="results-count">Showing 1-10 of 550 servers</div>
+              <div class="results-sort">
+                <span class="results-sort-label">Sort by:</span>
+                <select class="results-sort-select">
+                  <option>Relevance</option>
+                  <option>Most Popular</option>
+                  <option>Newest</option>
+                  <option>Highest Rating</option>
+                  <option>A-Z</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="results-grid">
+              <!-- Server Card 1 -->
+              <div class="server-card">
+                <div class="server-header">
+                  <div class="server-icon" style="background-color: #3b82f6">
+                    DA
+                  </div>
+                  <div>
+                    <a href="#" class="server-name">DataAnalyst Pro</a>
+                    <div class="server-provider">by QuantumData Labs</div>
+                  </div>
+                </div>
+                <div class="server-metadata">
+                  <span class="server-tag type">Agent</span>
+                  <span class="server-tag">Data Analysis</span>
+                  <span class="server-tag">Analytics</span>
+                </div>
+                <div class="server-info">
+                  Expert data analysis agent with advanced statistical tooling
+                  and visualization capabilities. Processes complex datasets and
+                  generates insights.
+                </div>
+                <div class="server-stats">
+                  <div class="server-stat">
+                    <div class="stat-value">99.8%</div>
+                    <div class="stat-label">Uptime</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">4.9</div>
+                    <div class="stat-label">Rating</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">12.5K</div>
+                    <div class="stat-label">Uses</div>
+                  </div>
+                </div>
+                <div class="server-footer">
+                  <a href="#" class="server-connect">Details →</a>
+                  <div class="verified-badge">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Verified
+                  </div>
+                </div>
+              </div>
+
+              <!-- Server Card 2 -->
+              <div class="server-card">
+                <div class="server-header">
+                  <div class="server-icon" style="background-color: #ef4444">
+                    CV
+                  </div>
+                  <div>
+                    <a href="#" class="server-name">ComputerVision API</a>
+                    <div class="server-provider">by PixelSense.io</div>
+                  </div>
+                </div>
+                <div class="server-metadata">
+                  <span class="server-tag type">Tool</span>
+                  <span class="server-tag">Vision</span>
+                  <span class="server-tag">API</span>
+                </div>
+                <div class="server-info">
+                  Advanced computer vision tools for object detection, scene
+                  understanding, and image generation. High-throughput API with
+                  broad framework support.
+                </div>
+                <div class="server-stats">
+                  <div class="server-stat">
+                    <div class="stat-value">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">Rating</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">18.2K</div>
+                    <div class="stat-label">Uses</div>
+                  </div>
+                </div>
+                <div class="server-footer">
+                  <a href="#" class="server-connect">Details →</a>
+                  <div class="verified-badge">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Verified
+                  </div>
+                </div>
+              </div>
+
+              <!-- Server Card 3 -->
+              <div class="server-card">
+                <div class="server-header">
+                  <div class="server-icon" style="background-color: #10b981">
+                    KG
+                  </div>
+                  <div>
+                    <a href="#" class="server-name">Knowledge Graph</a>
+                    <div class="server-provider">by GraphMinds</div>
+                  </div>
+                </div>
+                <div class="server-metadata">
+                  <span class="server-tag type">Resource</span>
+                  <span class="server-tag">Knowledge</span>
+                  <span class="server-tag">Vector DB</span>
+                </div>
+                <div class="server-info">
+                  Comprehensive knowledge graph with billions of connected
+                  entities and relationships. Optimized for semantic queries and
+                  complex reasoning.
+                </div>
+                <div class="server-stats">
+                  <div class="server-stat">
+                    <div class="stat-value">99.5%</div>
+                    <div class="stat-label">Uptime</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">4.7</div>
+                    <div class="stat-label">Rating</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">9.7K</div>
+                    <div class="stat-label">Uses</div>
+                  </div>
+                </div>
+                <div class="server-footer">
+                  <a href="#" class="server-connect">Details →</a>
+                  <div class="verified-badge">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Verified
+                  </div>
+                </div>
+              </div>
+
+              <!-- Server Card 4 -->
+              <div class="server-card">
+                <div class="server-header">
+                  <div class="server-icon" style="background-color: #f59e0b">
+                    ML
+                  </div>
+                  <div>
+                    <a href="#" class="server-name">MarkupLabs Audio</a>
+                    <div class="server-provider">by Audio.ai</div>
+                  </div>
+                </div>
+                <div class="server-metadata">
+                  <span class="server-tag type">Tool</span>
+                  <span class="server-tag">Audio</span>
+                  <span class="server-tag">Media</span>
+                </div>
+                <div class="server-info">
+                  Audio processing toolkit for speech recognition, audio
+                  classification, and music generation. Low latency with high
+                  accuracy on various audio sources.
+                </div>
+                <div class="server-stats">
+                  <div class="server-stat">
+                    <div class="stat-value">99.6%</div>
+                    <div class="stat-label">Uptime</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">4.6</div>
+                    <div class="stat-label">Rating</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">7.2K</div>
+                    <div class="stat-label">Uses</div>
+                  </div>
+                </div>
+                <div class="server-footer">
+                  <a href="#" class="server-connect">Details →</a>
+                  <div class="verified-badge">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Verified
+                  </div>
+                </div>
+              </div>
+
+              <!-- Server Card 5 -->
+              <div class="server-card">
+                <div class="server-header">
+                  <div class="server-icon" style="background-color: #6366f1">
+                    FP
+                  </div>
+                  <div>
+                    <a href="#" class="server-name">FinPlan Agent</a>
+                    <div class="server-provider">by FinTechAI</div>
+                  </div>
+                </div>
+                <div class="server-metadata">
+                  <span class="server-tag type">Agent</span>
+                  <span class="server-tag">Finance</span>
+                  <span class="server-tag">Planning</span>
+                </div>
+                <div class="server-info">
+                  Financial planning agent with portfolio optimization, risk
+                  assessment, and market analysis capabilities. Integrates with
+                  major financial data sources.
+                </div>
+                <div class="server-stats">
+                  <div class="server-stat">
+                    <div class="stat-value">99.7%</div>
+                    <div class="stat-label">Uptime</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">4.9</div>
+                    <div class="stat-label">Rating</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">5.8K</div>
+                    <div class="stat-label">Uses</div>
+                  </div>
+                </div>
+                <div class="server-footer">
+                  <a href="#" class="server-connect">Details →</a>
+                  <div class="verified-badge">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Verified
+                  </div>
+                </div>
+              </div>
+
+              <!-- Server Card 6 -->
+              <div class="server-card">
+                <div class="server-header">
+                  <div class="server-icon" style="background-color: #8b5cf6">
+                    SC
+                  </div>
+                  <div>
+                    <a href="#" class="server-name">SmartCode Generator</a>
+                    <div class="server-provider">by DevAI Systems</div>
+                  </div>
+                </div>
+                <div class="server-metadata">
+                  <span class="server-tag type">Agent</span>
+                  <span class="server-tag">Coding</span>
+                  <span class="server-tag">Development</span>
+                </div>
+                <div class="server-info">
+                  Advanced code generation agent supporting multiple programming
+                  languages. Specializes in translating natural language
+                  requirements into efficient, well-tested code.
+                </div>
+                <div class="server-stats">
+                  <div class="server-stat">
+                    <div class="stat-value">99.4%</div>
+                    <div class="stat-label">Uptime</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">Rating</div>
+                  </div>
+                  <div class="server-stat">
+                    <div class="stat-value">14.3K</div>
+                    <div class="stat-label">Uses</div>
+                  </div>
+                </div>
+                <div class="server-footer">
+                  <a href="#" class="server-connect">Details →</a>
+                  <div class="verified-badge">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Verified
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pagination">
+              <ul class="pagination-list">
+                <li class="pagination-item">
+                  <a href="#" class="pagination-link">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+                <li class="pagination-item">
+                  <a href="#" class="pagination-link active">1</a>
+                </li>
+                <li class="pagination-item">
+                  <a href="#" class="pagination-link">2</a>
+                </li>
+                <li class="pagination-item">
+                  <a href="#" class="pagination-link">3</a>
+                </li>
+                <li class="pagination-item">
+                  <div class="pagination-ellipsis">…</div>
+                </li>
+                <li class="pagination-item">
+                  <a href="#" class="pagination-link">55</a>
+                </li>
+                <li class="pagination-item">
+                  <a href="#" class="pagination-link">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a href="#" class="footer-logo">MCP Nexus</a>
+            <p class="footer-description">
+              The decentralized registry for Multi-Agent Communication Protocol
+              (MCP) servers. Connecting AI systems in an open network.
+            </p>
+            <div class="social-links">
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                  ></path>
+                </svg>
+              </a>
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+                  ></path>
+                  <rect x="2" y="9" width="4" height="12"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                  ></path>
+                </svg>
+              </a>
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path
+                    d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+                  ></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="footer-title">Product</h3>
+            <ul class="footer-links">
+              <li><a href="#">Registry</a></li>
+              <li><a href="#">Discovery</a></li>
+              <li><a href="#">Verification</a></li>
+              <li><a href="#">Analytics</a></li>
+              <li><a href="#">SDK</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="footer-title">Resources</h3>
+            <ul class="footer-links">
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">API Reference</a></li>
+              <li><a href="#">Tutorials</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Case Studies</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="footer-title">Company</h3>
+            <ul class="footer-links">
+              <li><a href="#">About</a></li>
+              <li><a href="#">Team</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Contact</a></li>
+              <li><a href="#">Privacy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="copyright">&copy; 2025 MCP Nexus. All rights reserved.</div>
+      </div>
+    </footer>
+  </body>
+</html>

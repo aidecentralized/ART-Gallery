@@ -1,0 +1,1635 @@
+openapi: 3.0.3
+info:
+  title: MCP Nexus API
+  description: |
+    The MCP Nexus API enables developers to register, discover, and integrate with MCP servers 
+    in a decentralized network. This API powers the MCP Nexus platform which serves as an 
+    open alternative to centralized MCP registries.
+  version: 1.0.0
+  contact:
+    name: MCP Nexus Team
+    url: https://mcpnexus.io/contact
+    email: api@mcpnexus.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.mcpnexus.io/v1
+    description: Production API
+  - url: https://staging-api.mcpnexus.io/v1
+    description: Staging API
+
+tags:
+  - name: Authentication
+    description: Authentication and authorization endpoints
+  - name: Servers
+    description: MCP server registration and management
+  - name: Discovery
+    description: Search and discovery of MCP servers
+  - name: Verification
+    description: Server verification and health checking
+  - name: Analytics
+    description: Usage statistics and analytics
+  - name: Webhooks
+    description: Event notifications and webhooks
+
+paths:
+  #
+  # Authentication Endpoints
+  #
+  /auth/token:
+    post:
+      tags:
+        - Authentication
+      summary: Get an authentication token
+      description: |
+        Exchange credentials for an authentication token that can be used for subsequent API requests.
+      operationId: getAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        "200":
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh authentication token
+      description: |
+        Exchange a refresh token for a new authentication token.
+      operationId: refreshAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        "200":
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
+        "401":
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  #
+  # Server Registration and Management
+  #
+  /servers:
+    get:
+      tags:
+        - Servers
+      summary: List registered MCP servers
+      description: |
+        Returns a paginated list of MCP servers, with optional filtering.
+      operationId: listServers
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - name: type
+          in: query
+          description: Filter by server type
+          schema:
+            type: string
+            enum: [agent, resource, tool]
+        - name: tags
+          in: query
+          description: Filter by tags (comma-separated)
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Search term to filter results
+          schema:
+            type: string
+        - name: provider
+          in: query
+          description: Filter by provider name
+          schema:
+            type: string
+        - name: verified
+          in: query
+          description: Filter by verification status
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of servers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServerSummary"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+    post:
+      tags:
+        - Servers
+      summary: Register a new MCP server
+      description: |
+        Register a new MCP server in the decentralized registry.
+      operationId: registerServer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServerRegistration"
+      responses:
+        "201":
+          description: Server registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /servers/{server_id}:
+    get:
+      tags:
+        - Servers
+      summary: Get MCP server details
+      description: |
+        Retrieve detailed information about a specific MCP server.
+      operationId: getServer
+      parameters:
+        - name: server_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Server details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+        "404":
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - Servers
+      summary: Update MCP server
+      description: |
+        Update the details of an existing MCP server.
+      operationId: updateServer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: server_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServerUpdate"
+      responses:
+        "200":
+          description: Server updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Servers
+      summary: Delete MCP server
+      description: |
+        Remove an MCP server from the registry.
+      operationId: deleteServer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: server_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server deleted successfully
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  #
+  # Discovery Endpoints
+  #
+  /discovery/search:
+    get:
+      tags:
+        - Discovery
+      summary: Search for MCP servers
+      description: |
+        Advanced semantic search for discovering MCP servers based on capabilities, 
+        functionality, and other criteria.
+      operationId: searchServers
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/LimitParam"
+        - name: q
+          in: query
+          description: Search query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Filter by server type
+          schema:
+            type: string
+            enum: [agent, resource, tool]
+        - name: tags
+          in: query
+          description: Filter by tags (comma-separated)
+          schema:
+            type: string
+        - name: verified
+          in: query
+          description: Filter by verification status
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServerSearchResult"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
+  /discovery/recommend:
+    get:
+      tags:
+        - Discovery
+      summary: Get server recommendations
+      description: |
+        Get personalized recommendations for MCP servers based on usage history,
+        preferences, and popularity.
+      operationId: getRecommendations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          description: Filter by server type
+          schema:
+            type: string
+            enum: [agent, resource, tool]
+        - name: limit
+          in: query
+          description: Maximum number of recommendations to return
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
+            maximum: 20
+      responses:
+        "200":
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServerRecommendation"
+
+  /discovery/popular:
+    get:
+      tags:
+        - Discovery
+      summary: Get popular MCP servers
+      description: |
+        Get a list of popular MCP servers based on usage statistics and ratings.
+      operationId: getPopularServers
+      parameters:
+        - name: type
+          in: query
+          description: Filter by server type
+          schema:
+            type: string
+            enum: [agent, resource, tool]
+        - name: period
+          in: query
+          description: Time period for popularity calculation
+          schema:
+            type: string
+            enum: [day, week, month, all_time]
+            default: week
+        - name: limit
+          in: query
+          description: Maximum number of servers to return
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 50
+      responses:
+        "200":
+          description: Popular servers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServerSummary"
+
+  #
+  # Verification Endpoints
+  #
+  /verification/request/{server_id}:
+    post:
+      tags:
+        - Verification
+      summary: Request server verification
+      description: |
+        Initiate the verification process for an MCP server. This starts the process
+        of verifying ownership, functionality, and security of the server.
+      operationId: requestVerification
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: server_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verification process initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationRequest"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /verification/status/{verification_id}:
+    get:
+      tags:
+        - Verification
+      summary: Check verification status
+      description: |
+        Check the status of a server verification request.
+      operationId: getVerificationStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: verification_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verification status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationStatus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Verification request not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /verification/complete/{verification_id}:
+    post:
+      tags:
+        - Verification
+      summary: Complete verification
+      description: |
+        Complete the verification process by providing necessary proof of ownership
+        and other required information.
+      operationId: completeVerification
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: verification_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationCompletion"
+      responses:
+        "200":
+          description: Verification completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationResult"
+        "400":
+          description: Invalid verification data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Verification request not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  #
+  # Analytics Endpoints
+  #
+  /analytics/servers/{server_id}:
+    get:
+      tags:
+        - Analytics
+      summary: Get server analytics
+      description: |
+        Retrieve usage analytics for a specific MCP server.
+      operationId: getServerAnalytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: server_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: Time period for analytics
+          schema:
+            type: string
+            enum: [day, week, month, year]
+            default: month
+        - name: start_date
+          in: query
+          description: Start date for custom time range (ISO format)
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: End date for custom time range (ISO format)
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Server analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerAnalytics"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /analytics/network:
+    get:
+      tags:
+        - Analytics
+      summary: Get network analytics
+      description: |
+        Retrieve analytics about the overall MCP Nexus network.
+      operationId: getNetworkAnalytics
+      parameters:
+        - name: period
+          in: query
+          description: Time period for analytics
+          schema:
+            type: string
+            enum: [day, week, month, year]
+            default: month
+      responses:
+        "200":
+          description: Network analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NetworkAnalytics"
+
+  #
+  # Webhook Endpoints
+  #
+  /webhooks:
+    get:
+      tags:
+        - Webhooks
+      summary: List configured webhooks
+      description: |
+        Get a list of configured webhooks for event notifications.
+      operationId: listWebhooks
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Webhook"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - Webhooks
+      summary: Create webhook
+      description: |
+        Create a new webhook for event notifications.
+      operationId: createWebhook
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookCreate"
+      responses:
+        "201":
+          description: Webhook created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+        "400":
+          description: Invalid webhook configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /webhooks/{webhook_id}:
+    get:
+      tags:
+        - Webhooks
+      summary: Get webhook details
+      description: |
+        Retrieve details of a specific webhook.
+      operationId: getWebhook
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: webhook_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Webhook details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - Webhooks
+      summary: Update webhook
+      description: |
+        Update a webhook configuration.
+      operationId: updateWebhook
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: webhook_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookUpdate"
+      responses:
+        "200":
+          description: Webhook updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Webhook"
+        "400":
+          description: Invalid webhook configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - Webhooks
+      summary: Delete webhook
+      description: |
+        Delete a webhook configuration.
+      operationId: deleteWebhook
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: webhook_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Webhook deleted successfully
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Page number for pagination
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+
+  schemas:
+    #
+    # Authentication Schemas
+    #
+    AuthToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT token for API authentication
+        token_type:
+          type: string
+          default: bearer
+        expires_in:
+          type: integer
+          description: Token validity in seconds
+        refresh_token:
+          type: string
+          description: Token used to refresh the access token
+        scope:
+          type: string
+          description: Scope of access granted
+
+    #
+    # Server Schemas
+    #
+    ServerSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique server identifier
+        name:
+          type: string
+          description: Server name
+        slug:
+          type: string
+          description: URL-friendly identifier
+        description:
+          type: string
+          description: Brief server description
+        provider:
+          type: string
+          description: Organization or individual providing the server
+        types:
+          type: array
+          description: Server types (agent, resource, tool)
+          items:
+            type: string
+            enum: [agent, resource, tool]
+        tags:
+          type: array
+          description: Categorization tags
+          items:
+            type: string
+        verified:
+          type: boolean
+          description: Whether the server has been verified
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        logo_url:
+          type: string
+          format: uri
+          description: URL to server logo
+        rating:
+          type: number
+          format: float
+          description: Average rating (0-5)
+        uptime:
+          type: number
+          format: float
+          description: Server uptime percentage (last 30 days)
+
+    Server:
+      allOf:
+        - $ref: "#/components/schemas/ServerSummary"
+        - type: object
+          properties:
+            url:
+              type: string
+              format: uri
+              description: MCP server URL
+            documentation_url:
+              type: string
+              format: uri
+              description: Documentation URL
+            version:
+              type: string
+              description: Server version
+            capabilities:
+              type: array
+              description: Detailed capabilities provided by the server
+              items:
+                $ref: "#/components/schemas/ServerCapability"
+            protocols:
+              type: array
+              description: Supported protocols and specifications
+              items:
+                type: string
+            usage_requirements:
+              type: object
+              description: Requirements for using the server
+              properties:
+                authentication_required:
+                  type: boolean
+                  description: Whether authentication is required
+                authentication_type:
+                  type: string
+                  enum: [none, api_key, oauth2, jwt, other]
+                rate_limits:
+                  type: string
+                  description: Description of rate limits
+                pricing:
+                  type: string
+                  description: Pricing information
+            status:
+              type: object
+              properties:
+                is_active:
+                  type: boolean
+                last_checked:
+                  type: string
+                  format: date-time
+                message:
+                  type: string
+            owner_id:
+              type: string
+              description: ID of the server owner (not publicly visible)
+      required:
+        - id
+        - name
+        - slug
+        - description
+        - provider
+        - types
+        - url
+        - created_at
+        - updated_at
+
+    ServerCapability:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Capability name
+        description:
+          type: string
+          description: Detailed description
+        type:
+          type: string
+          enum: [agent, resource, tool]
+        parameters:
+          type: array
+          description: Parameters accepted by this capability
+          items:
+            $ref: "#/components/schemas/CapabilityParameter"
+        examples:
+          type: array
+          description: Usage examples
+          items:
+            type: string
+      required:
+        - name
+        - description
+        - type
+
+    CapabilityParameter:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Parameter name
+        description:
+          type: string
+          description: Parameter description
+        type:
+          type: string
+          description: Parameter data type
+        required:
+          type: boolean
+          description: Whether the parameter is required
+        default:
+          type: string
+          description: Default value (if any)
+      required:
+        - name
+        - type
+
+    ServerRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Server name
+        slug:
+          type: string
+          description: URL-friendly identifier
+        description:
+          type: string
+          description: Brief server description
+        provider:
+          type: string
+          description: Organization or individual providing the server
+        url:
+          type: string
+          format: uri
+          description: MCP server URL
+        documentation_url:
+          type: string
+          format: uri
+          description: Documentation URL
+        types:
+          type: array
+          description: Server types (agent, resource, tool)
+          items:
+            type: string
+            enum: [agent, resource, tool]
+        tags:
+          type: array
+          description: Categorization tags
+          items:
+            type: string
+        logo:
+          type: string
+          format: byte
+          description: Base64-encoded server logo image
+        capabilities:
+          type: array
+          description: Detailed capabilities provided by the server
+          items:
+            $ref: "#/components/schemas/ServerCapability"
+        protocols:
+          type: array
+          description: Supported protocols and specifications
+          items:
+            type: string
+        usage_requirements:
+          type: object
+          description: Requirements for using the server
+          properties:
+            authentication_required:
+              type: boolean
+              description: Whether authentication is required
+            authentication_type:
+              type: string
+              enum: [none, api_key, oauth2, jwt, other]
+            rate_limits:
+              type: string
+              description: Description of rate limits
+            pricing:
+              type: string
+              description: Pricing information
+        contact_email:
+          type: string
+          format: email
+          description: Contact email (not publicly visible)
+      required:
+        - name
+        - description
+        - provider
+        - types
+        - url
+        - contact_email
+
+    ServerUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Server name
+        description:
+          type: string
+          description: Brief server description
+        url:
+          type: string
+          format: uri
+          description: MCP server URL
+        documentation_url:
+          type: string
+          format: uri
+          description: Documentation URL
+        types:
+          type: array
+          description: Server types (agent, resource, tool)
+          items:
+            type: string
+            enum: [agent, resource, tool]
+        tags:
+          type: array
+          description: Categorization tags
+          items:
+            type: string
+        logo:
+          type: string
+          format: byte
+          description: Base64-encoded server logo image
+        capabilities:
+          type: array
+          description: Detailed capabilities provided by the server
+          items:
+            $ref: "#/components/schemas/ServerCapability"
+        protocols:
+          type: array
+          description: Supported protocols and specifications
+          items:
+            type: string
+        usage_requirements:
+          type: object
+          description: Requirements for using the server
+          properties:
+            authentication_required:
+              type: boolean
+              description: Whether authentication is required
+            authentication_type:
+              type: string
+              enum: [none, api_key, oauth2, jwt, other]
+            rate_limits:
+              type: string
+              description: Description of rate limits
+            pricing:
+              type: string
+              description: Pricing information
+        contact_email:
+          type: string
+          format: email
+          description: Contact email (not publicly visible)
+
+    ServerSearchResult:
+      allOf:
+        - $ref: "#/components/schemas/ServerSummary"
+        - type: object
+          properties:
+            relevance_score:
+              type: number
+              format: float
+              description: Search relevance score
+            highlight:
+              type: object
+              description: Search term highlights
+              properties:
+                description:
+                  type: string
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+
+    ServerRecommendation:
+      allOf:
+        - $ref: "#/components/schemas/ServerSummary"
+        - type: object
+          properties:
+            recommendation_reason:
+              type: string
+              description: Reason for recommendation
+
+    #
+    # Verification Schemas
+    #
+    VerificationRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Verification request ID
+        server_id:
+          type: string
+          description: Server ID being verified
+        status:
+          type: string
+          enum: [pending, in_progress, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        verification_token:
+          type: string
+          description: Token used for domain verification
+        verification_instructions:
+          type: string
+          description: Instructions to complete verification
+      required:
+        - id
+        - server_id
+        - status
+        - created_at
+        - verification_token
+        - verification_instructions
+
+    VerificationStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        server_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, in_progress, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              status:
+                type: string
+                enum: [pending, passed, failed]
+              message:
+                type: string
+        next_steps:
+          type: string
+          description: Instructions for next steps in verification
+      required:
+        - id
+        - server_id
+        - status
+        - created_at
+        - checks
+
+    VerificationCompletion:
+      type: object
+      properties:
+        verification_method:
+          type: string
+          enum: [dns, file, meta_tag]
+          description: Method used for verification
+        verification_proof:
+          type: string
+          description: Proof of verification (depends on method)
+      required:
+        - verification_method
+        - verification_proof
+
+    VerificationResult:
+      type: object
+      properties:
+        id:
+          type: string
+        server_id:
+          type: string
+        status:
+          type: string
+          enum: [completed, failed]
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        verification_details:
+          type: object
+          properties:
+            method:
+              type: string
+            checks_passed:
+              type: array
+              items:
+                type: string
+            is_verified:
+              type: boolean
+        badge_url:
+          type: string
+          format: uri
+          description: URL to verification badge image
+      required:
+        - id
+        - server_id
+        - status
+        - created_at
+        - completed_at
+        - verification_details
+
+    #
+    # Analytics Schemas
+    #
+    ServerAnalytics:
+      type: object
+      properties:
+        server_id:
+          type: string
+        period:
+          type: string
+          enum: [day, week, month, year, custom]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        metrics:
+          type: object
+          properties:
+            total_requests:
+              type: integer
+            unique_clients:
+              type: integer
+            avg_response_time_ms:
+              type: number
+            error_rate:
+              type: number
+              format: float
+            uptime_percentage:
+              type: number
+              format: float
+        time_series:
+          type: object
+          properties:
+            requests:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  count:
+                    type: integer
+            response_times:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  avg_ms:
+                    type: number
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  count:
+                    type: integer
+        top_clients:
+          type: array
+          items:
+            type: object
+            properties:
+              client_id:
+                type: string
+              requests:
+                type: integer
+              percentage:
+                type: number
+                format: float
+        top_capabilities:
+          type: array
+          items:
+            type: object
+            properties:
+              capability:
+                type: string
+              requests:
+                type: integer
+              percentage:
+                type: number
+                format: float
+      required:
+        - server_id
+        - period
+        - start_date
+        - end_date
+        - metrics
+
+    NetworkAnalytics:
+      type: object
+      properties:
+        period:
+          type: string
+          enum: [day, week, month, year]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        metrics:
+          type: object
+          properties:
+            total_servers:
+              type: integer
+            active_servers:
+              type: integer
+            total_requests:
+              type: integer
+            unique_clients:
+              type: integer
+            new_servers:
+              type: integer
+        server_types:
+          type: object
+          properties:
+            agents:
+              type: integer
+            resources:
+              type: integer
+            tools:
+              type: integer
+        top_tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag:
+                type: string
+              count:
+                type: integer
+        time_series:
+          type: object
+          properties:
+            servers:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  count:
+                    type: integer
+            requests:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  count:
+                    type: integer
+      required:
+        - period
+        - start_date
+        - end_date
+        - metrics
+
+    #
+    # Webhook Schemas
+    #
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - server.created
+              - server.updated
+              - server.deleted
+              - server.verified
+              - verification.requested
+              - verification.completed
+              - server.status_changed
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        secret:
+          type: string
+          description: Secret used to sign webhook payloads
+      required:
+        - id
+        - url
+        - events
+        - active
+        - created_at
+
+    WebhookCreate:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - server.created
+              - server.updated
+              - server.deleted
+              - server.verified
+              - verification.requested
+              - verification.completed
+              - server.status_changed
+        description:
+          type: string
+      required:
+        - url
+        - events
+
+    WebhookUpdate:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - server.created
+              - server.updated
+              - server.deleted
+              - server.verified
+              - verification.requested
+              - verification.completed
+              - server.status_changed
+        active:
+          type: boolean
+        description:
+          type: string
+
+    #
+    # Common Schemas
+    #
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+        per_page:
+          type: integer
+          description: Number of items per page
+        current_page:
+          type: integer
+          description: Current page number
+        last_page:
+          type: integer
+          description: Last page number
+        next_page_url:
+          type: string
+          nullable: true
+          description: URL for the next page
+        prev_page_url:
+          type: string
+          nullable: true
+          description: URL for the previous page
+      required:
+        - total
+        - per_page
+        - current_page
+        - last_page
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+      required:
+        - code
+        - message

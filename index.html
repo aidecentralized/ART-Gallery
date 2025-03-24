@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCP Nexus | Decentralized Agent Communication</title>
+    <style>
+      :root {
+        --primary: #5046e5;
+        --primary-dark: #3832a0;
+        --secondary: #06b6d4;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --bg: #ffffff;
+        --bg-alt: #f8fafc;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      }
+
+      body {
+        color: var(--text);
+        background-color: var(--bg);
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      header {
+        padding: 1.25rem 0;
+        background-color: var(--bg);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      .header-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .logo-icon {
+        margin-right: 0.75rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--primary);
+        color: white;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+      }
+
+      nav a {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      nav a:hover {
+        color: var(--primary);
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        border: 1px solid var(--primary);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+      }
+
+      .btn-outline {
+        background-color: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+
+      .btn-outline:hover {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      /* Hero Section */
+      .hero {
+        padding: 6rem 0;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(80, 70, 229, 0.1),
+          rgba(255, 255, 255, 0) 70%
+        );
+      }
+
+      .hero-inner {
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+      }
+
+      .hero-content {
+        flex: 1;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        line-height: 1.1;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .hero-image {
+        flex: 1;
+        position: relative;
+      }
+
+      .hero-image img {
+        width: 100%;
+        border-radius: 0.5rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      /* Stats Section */
+      .stats {
+        padding: 5rem 0;
+        background-color: var(--bg-alt);
+      }
+
+      .stats-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 3rem;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2rem;
+      }
+
+      .stat-card {
+        background-color: var(--bg);
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        color: var(--text-light);
+        font-weight: 500;
+      }
+
+      /* Features Section */
+      .features {
+        padding: 5rem 0;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .section-subtitle {
+        text-align: center;
+        color: var(--text-light);
+        margin-bottom: 3rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        padding: 2rem;
+        border-radius: 0.5rem;
+        background-color: var(--bg);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background-color: rgba(80, 70, 229, 0.1);
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+      }
+
+      .feature-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .feature-description {
+        color: var(--text-light);
+      }
+
+      /* CTA Section */
+      .cta {
+        padding: 5rem 0;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        color: white;
+      }
+
+      .cta-inner {
+        text-align: center;
+      }
+
+      .cta-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .cta-subtitle {
+        margin-bottom: 2rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      .btn-white {
+        background-color: white;
+        color: var(--primary);
+        border: 1px solid white;
+      }
+
+      .btn-white:hover {
+        background-color: transparent;
+        color: white;
+      }
+
+      .btn-white-outline {
+        background-color: transparent;
+        color: white;
+        border: 1px solid white;
+      }
+
+      .btn-white-outline:hover {
+        background-color: white;
+        color: var(--primary);
+      }
+
+      /* Footer */
+      footer {
+        padding: 5rem 0;
+        background-color: var(--bg-alt);
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 4rem;
+      }
+
+      .footer-logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        display: inline-block;
+      }
+
+      .footer-description {
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: var(--bg);
+        color: var(--text);
+        transition: all 0.2s;
+      }
+
+      .social-link:hover {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .footer-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links {
+        list-style: none;
+      }
+
+      .footer-links li {
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-links a {
+        color: var(--text-light);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .footer-links a:hover {
+        color: var(--primary);
+      }
+
+      .copyright {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        text-align: center;
+        color: var(--text-light);
+      }
+
+      /* Floating Particles */
+      .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+      }
+
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(80, 70, 229, 0.3);
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .hero-inner {
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .hero-title {
+          font-size: 2.5rem;
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        nav ul {
+          display: none;
+        }
+      }
+
+      /* Animated ART Flow Diagram */
+      .art-flow {
+        margin: 4rem auto;
+        position: relative;
+        max-width: 900px;
+        height: 300px;
+      }
+
+      .art-node {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .agent-node {
+        background: var(--primary);
+        top: 10px;
+        left: 10%;
+      }
+
+      .resources-node {
+        background: var(--secondary);
+        top: 90px;
+        left: 40%;
+      }
+
+      .tools-node {
+        background: var(--success);
+        top: 170px;
+        left: 70%;
+      }
+
+      .flow-line {
+        position: absolute;
+        height: 2px;
+        background: #ccc;
+        transform-origin: left center;
+      }
+
+      .search-container {
+        margin: 2rem 0;
+        display: flex;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .search-input {
+        flex-grow: 1;
+        padding: 1rem 1.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem 0 0 0.375rem;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      .search-input:focus {
+        border-color: var(--primary);
+      }
+
+      .search-button {
+        padding: 1rem 1.5rem;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 0 0.375rem 0.375rem 0;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .search-button:hover {
+        background-color: var(--primary-dark);
+      }
+
+      /* Featured MCP Servers */
+      .featured-servers {
+        margin-top: 3rem;
+      }
+
+      .server-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .server-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+      }
+
+      .server-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .server-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .server-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+        font-weight: bold;
+      }
+
+      .server-metadata {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .server-tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        background: #f1f5f9;
+        color: var(--text-light);
+      }
+
+      .server-info {
+        margin-bottom: 1.5rem;
+        color: var(--text-light);
+        font-size: 0.875rem;
+      }
+
+      .server-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.875rem;
+      }
+
+      .server-stats {
+        display: flex;
+        gap: 1rem;
+        color: var(--text-light);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container header-inner">
+        <a href="#" class="logo">
+          <div class="logo-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 10h-4V6"></path>
+              <path d="M14 10 21 3"></path>
+              <path d="M6 14h4v4"></path>
+              <path d="M10 14 3 21"></path>
+              <ellipse cx="12" cy="12" rx="10" ry="10"></ellipse>
+            </svg>
+          </div>
+          MCP Nexus
+        </a>
+        <nav>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="explorer.html">Explore</a></li>
+            <li><a href="registry.html">Registry</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Community</a></li>
+          </ul>
+        </nav>
+        <div class="nav-buttons">
+          <a href="#" class="btn btn-outline">Sign In</a>
+          <a href="#" class="btn btn-primary">Register MCP Server</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="particles" id="particles"></div>
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <h1 class="hero-title">The Open Registry for AI Communication</h1>
+          <p class="hero-subtitle">
+            Connect, discover, and integrate MCP servers in a truly
+            decentralized network. Build the future of inter-agent communication
+            without centralized gatekeepers.
+          </p>
+          <div class="hero-buttons">
+            <a href="#" class="btn btn-primary">Register Your MCP Server</a>
+            <a href="#" class="btn btn-outline">Explore Registry</a>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img
+            src="/api/placeholder/600/400"
+            alt="MCP Nexus Network Visualization"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="container">
+        <h2 class="stats-title">Growing Decentralized Network</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">4,000+</div>
+            <div class="stat-label">MCP Servers Registered</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">12M+</div>
+            <div class="stat-label">Monthly Requests</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">1,500+</div>
+            <div class="stat-label">Active Developers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">75+</div>
+            <div class="stat-label">Countries Represented</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <h2 class="section-title">Why MCP Nexus?</h2>
+        <p class="section-subtitle">
+          Build on a truly open protocol with no centralized control. Connect
+          any Agent, Resource, or Tool through a standardized interface.
+        </p>
+
+        <div class="art-flow">
+          <div class="art-node agent-node">Agents</div>
+          <div class="art-node resources-node">Resources</div>
+          <div class="art-node tools-node">Tools</div>
+          <!-- Lines connecting nodes would be animated with JavaScript -->
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"
+                ></path>
+                <polygon points="12 15 17 21 7 21 12 15"></polygon>
+              </svg>
+            </div>
+            <h3 class="feature-title">Decentralized Registry</h3>
+            <p class="feature-description">
+              Register and discover MCP servers in a fully decentralized
+              network. No central authority controls access or visibility.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="4"></circle>
+                <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+                <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+                <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+                <line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line>
+                <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+              </svg>
+            </div>
+            <h3 class="feature-title">Advanced Discovery</h3>
+            <p class="feature-description">
+              Find the perfect ARTs for your AI applications with powerful
+              semantic search and metadata filtering.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Security & Trust</h3>
+            <p class="feature-description">
+              Built-in verification, ratings, and security monitoring for all
+              registered MCP servers. Know what you're connecting to.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Open Standards</h3>
+            <p class="feature-description">
+              Fully compatible with MCP protocol and other emerging standards
+              for agent communication. No vendor lock-in.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                ></path>
+                <path
+                  d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Easy Integration</h3>
+            <p class="feature-description">
+              SDK and libraries for all major languages and frameworks. Connect
+              to any MCP server with just a few lines of code.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </div>
+            <h3 class="feature-title">Real-time Monitoring</h3>
+            <p class="feature-description">
+              Track performance, uptime, and usage patterns across the network.
+              Get alerts when services go down.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="search-section">
+      <div class="container">
+        <h2 class="section-title">Discover MCP Servers</h2>
+        <p class="section-subtitle">
+          Search the decentralized registry for Agents, Resources, and Tools
+        </p>
+
+        <div class="search-container">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search for AI services, tools, or resources..."
+          />
+          <button class="search-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="featured-servers">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1rem">
+            Featured MCP Servers
+          </h3>
+
+          <div class="server-grid">
+            <div class="server-card">
+              <div class="server-header">
+                <div class="server-icon" style="background-color: #3b82f6">
+                  DA
+                </div>
+                <div>
+                  <h4 style="font-weight: 600">DataAnalyst Pro</h4>
+                  <div style="font-size: 0.875rem; color: var(--text-light)">
+                    by QuantumData Labs
+                  </div>
+                </div>
+              </div>
+              <div class="server-metadata">
+                <span class="server-tag">Agent</span>
+                <span class="server-tag">Data Analysis</span>
+                <span class="server-tag">Verified</span>
+              </div>
+              <div class="server-info">
+                Expert data analysis agent with advanced statistical tooling and
+                visualization capabilities.
+              </div>
+              <div class="server-footer">
+                <a
+                  href="#"
+                  style="
+                    color: var(--primary);
+                    font-weight: 500;
+                    text-decoration: none;
+                  "
+                  >Connect →</a
+                >
+                <div class="server-stats">
+                  <span>99.8% Uptime</span>
+                  <span>★ 4.9</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="server-card">
+              <div class="server-header">
+                <div class="server-icon" style="background-color: #ef4444">
+                  CV
+                </div>
+                <div>
+                  <h4 style="font-weight: 600">ComputerVision API</h4>
+                  <div style="font-size: 0.875rem; color: var(--text-light)">
+                    by PixelSense.io
+                  </div>
+                </div>
+              </div>
+              <div class="server-metadata">
+                <span class="server-tag">Tool</span>
+                <span class="server-tag">Vision</span>
+                <span class="server-tag">API</span>
+              </div>
+              <div class="server-info">
+                Advanced computer vision tools for object detection, scene
+                understanding, and image generation.
+              </div>
+              <div class="server-footer">
+                <a
+                  href="#"
+                  style="
+                    color: var(--primary);
+                    font-weight: 500;
+                    text-decoration: none;
+                  "
+                  >Connect →</a
+                >
+                <div class="server-stats">
+                  <span>99.9% Uptime</span>
+                  <span>★ 4.8</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="server-card">
+              <div class="server-header">
+                <div class="server-icon" style="background-color: #10b981">
+                  KG
+                </div>
+                <div>
+                  <h4 style="font-weight: 600">Knowledge Graph</h4>
+                  <div style="font-size: 0.875rem; color: var(--text-light)">
+                    by GraphMinds
+                  </div>
+                </div>
+              </div>
+              <div class="server-metadata">
+                <span class="server-tag">Resource</span>
+                <span class="server-tag">Knowledge</span>
+                <span class="server-tag">Vector DB</span>
+              </div>
+              <div class="server-info">
+                Comprehensive knowledge graph with billions of connected
+                entities and relationships.
+              </div>
+              <div class="server-footer">
+                <a
+                  href="#"
+                  style="
+                    color: var(--primary);
+                    font-weight: 500;
+                    text-decoration: none;
+                  "
+                  >Connect →</a
+                >
+                <div class="server-stats">
+                  <span>99.5% Uptime</span>
+                  <span>★ 4.7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="container cta-inner">
+        <h2 class="cta-title">Join the Decentralized Network Today</h2>
+        <p class="cta-subtitle">
+          Be part of building a truly open AI ecosystem. Register your MCP
+          servers or start integrating with existing ones.
+        </p>
+        <div class="cta-buttons">
+          <a href="#" class="btn btn-white">Register MCP Server</a>
+          <a href="#" class="btn btn-white-outline">Explore Registry</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a href="#" class="footer-logo">MCP Nexus</a>
+            <p class="footer-description">
+              The decentralized registry for Multi-Agent Communication Protocol
+              (MCP) servers. Connecting AI systems in an open network.
+            </p>
+            <div class="social-links">
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                  ></path>
+                </svg>
+              </a>
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+                  ></path>
+                  <rect x="2" y="9" width="4" height="12"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                  ></path>
+                </svg>
+              </a>
+              <a href="#" class="social-link">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path
+                    d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+                  ></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="footer-title">Product</h3>
+            <ul class="footer-links">
+              <li><a href="#">Registry</a></li>
+              <li><a href="#">Discovery</a></li>
+              <li><a href="#">Verification</a></li>
+              <li><a href="#">Analytics</a></li>
+              <li><a href="#">SDK</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="footer-title">Resources</h3>
+            <ul class="footer-links">
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">API Reference</a></li>
+              <li><a href="#">Tutorials</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Case Studies</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="footer-title">Company</h3>
+            <ul class="footer-links">
+              <li><a href="#">About</a></li>
+              <li><a href="#">Team</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Contact</a></li>
+              <li><a href="#">Privacy</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="copyright">&copy; 2025 MCP Nexus. All rights reserved.</div>
+      </div>
+    </footer>
+
+    <script>
+      // Simple particle animation
+      document.addEventListener("DOMContentLoaded", function () {
+        const particles = document.getElementById("particles");
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement("div");
+          particle.classList.add("particle");
+
+          // Random position, size, and opacity
+          const size = Math.random() * 10 + 2;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${Math.random() * 100}%`;
+          particle.style.top = `${Math.random() * 100}%`;
+          particle.style.opacity = Math.random() * 0.5 + 0.1;
+
+          // Animation properties
+          const duration = Math.random() * 20 + 10;
+          const delay = Math.random() * 5;
+
+          particle.style.animation = `float ${duration}s ${delay}s infinite linear`;
+          particles.appendChild(particle);
+        }
+
+        // Animate flow lines between ART nodes
+        const agent = document.querySelector(".agent-node");
+        const resources = document.querySelector(".resources-node");
+        const tools = document.querySelector(".tools-node");
+
+        if (agent && resources && tools) {
+          createFlowLine(agent, resources);
+          createFlowLine(resources, tools);
+          createFlowLine(agent, tools);
+        }
+
+        function createFlowLine(from, to) {
+          const line = document.createElement("div");
+          line.classList.add("flow-line");
+
+          // Calculate positions
+          const fromRect = from.getBoundingClientRect();
+          const toRect = to.getBoundingClientRect();
+
+          const fromCenterX = fromRect.left + fromRect.width / 2;
+          const fromCenterY = fromRect.top + fromRect.height / 2;
+          const toCenterX = toRect.left + toRect.width / 2;
+          const toCenterY = toRect.top + toRect.height / 2;
+
+          // Calculate distance and angle
+          const dx = toCenterX - fromCenterX;
+          const dy = toCenterY - fromCenterY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+          // Position and rotate line
+          line.style.position = "absolute";
+          line.style.width = `${distance}px`;
+          line.style.transform = `rotate(${angle}deg)`;
+          line.style.top = `${fromCenterY}px`;
+          line.style.left = `${fromCenterX}px`;
+
+          document.querySelector(".art-flow").appendChild(line);
+        }
+      });
+    </script>
+  </body>
+</html>
