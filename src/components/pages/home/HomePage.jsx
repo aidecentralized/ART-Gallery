@@ -1,9 +1,72 @@
-import React, { useEffect } from "react";
+// src/components/pages/home/HomePage.jsx
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./HomePage.css";
+import { serverApi, discoveryApi, analyticsApi } from "../../../api";
 import ServerCard from "../../common/ServerCard";
+import LoadingSpinner from "../../common/LoadingSpinner";
+import "./HomePage.css";
 
 const HomePage = () => {
+  // State for featured servers and network stats
+  const [featuredServers, setFeaturedServers] = useState([]);
+  const [networkStats, setNetworkStats] = useState({
+    totalServers: 0,
+    monthlyRequests: 0,
+    activeUsers: 0,
+    countries: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch popular servers
+        const popularResponse = await discoveryApi.getPopularServers(
+          "month",
+          3
+        );
+        setFeaturedServers(popularResponse.data.data || []);
+
+        // Fetch network analytics
+        try {
+          const analyticsResponse = await analyticsApi.getNetworkAnalytics(
+            "month"
+          );
+          const data = analyticsResponse.data;
+
+          setNetworkStats({
+            totalServers: data.metrics?.total_servers || 0,
+            monthlyRequests: data.metrics?.total_requests || 0,
+            activeUsers: data.metrics?.unique_clients || 0,
+            countries: 75, // This might not be available from the API, using a placeholder
+          });
+        } catch (analyticsError) {
+          console.error("Error fetching network analytics:", analyticsError);
+          // Fallback to server count if analytics fail
+          const serversResponse = await serverApi.getServers();
+          const totalServers =
+            serversResponse.data.pagination?.total ||
+            serversResponse.data.length ||
+            0;
+
+          setNetworkStats({
+            totalServers,
+            monthlyRequests: 0,
+            activeUsers: 0,
+            countries: 0,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching homepage data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // Handle particles animation
   useEffect(() => {
     // Simple particle animation
@@ -44,17 +107,21 @@ const HomePage = () => {
     }
 
     function createFlowLine(from, to) {
+      const flowWrapper = document.querySelector(".art-flow");
+      if (!flowWrapper) return;
+
       const line = document.createElement("div");
       line.classList.add("flow-line");
 
-      // Calculate positions
+      // Get the positions relative to the parent
       const fromRect = from.getBoundingClientRect();
       const toRect = to.getBoundingClientRect();
+      const parentRect = flowWrapper.getBoundingClientRect();
 
-      const fromCenterX = fromRect.left + fromRect.width / 2;
-      const fromCenterY = fromRect.top + fromRect.height / 2;
-      const toCenterX = toRect.left + toRect.width / 2;
-      const toCenterY = toRect.top + toRect.height / 2;
+      const fromCenterX = fromRect.left + fromRect.width / 2 - parentRect.left;
+      const fromCenterY = fromRect.top + fromRect.height / 2 - parentRect.top;
+      const toCenterX = toRect.left + toRect.width / 2 - parentRect.left;
+      const toCenterY = toRect.top + toRect.height / 2 - parentRect.top;
 
       // Calculate distance and angle
       const dx = toCenterX - fromCenterX;
@@ -63,58 +130,38 @@ const HomePage = () => {
       const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
       // Position and rotate line
-      line.style.position = "absolute";
       line.style.width = `${distance}px`;
-      line.style.transform = `rotate(${angle}deg)`;
-      line.style.top = `${fromCenterY}px`;
       line.style.left = `${fromCenterX}px`;
+      line.style.top = `${fromCenterY}px`;
+      line.style.transformOrigin = "0 0";
+      line.style.transform = `rotate(${angle}deg)`;
 
-      document.querySelector(".art-flow").appendChild(line);
+      flowWrapper.appendChild(line);
     }
+
+    // Cleanup function
+    return () => {
+      if (particles) {
+        while (particles.firstChild) {
+          particles.removeChild(particles.firstChild);
+        }
+      }
+
+      const flowLines = document.querySelectorAll(".flow-line");
+      flowLines.forEach((line) => line.remove());
+    };
   }, []);
 
-  // Sample featured server data
-  const featuredServers = [
-    {
-      id: 1,
-      name: "DataAnalyst Pro",
-      provider: "QuantumData Labs",
-      iconBg: "#3b82f6",
-      icon: "DA",
-      type: "Agent",
-      tags: ["Data Analysis", "Verified"],
-      description:
-        "Expert data analysis agent with advanced statistical tooling and visualization capabilities.",
-      uptime: "99.8%",
-      rating: "4.9",
-    },
-    {
-      id: 2,
-      name: "ComputerVision API",
-      provider: "PixelSense.io",
-      iconBg: "#ef4444",
-      icon: "CV",
-      type: "Tool",
-      tags: ["Vision", "API"],
-      description:
-        "Advanced computer vision tools for object detection, scene understanding, and image generation.",
-      uptime: "99.9%",
-      rating: "4.8",
-    },
-    {
-      id: 3,
-      name: "Knowledge Graph",
-      provider: "GraphMinds",
-      iconBg: "#10b981",
-      icon: "KG",
-      type: "Resource",
-      tags: ["Knowledge", "Vector DB"],
-      description:
-        "Comprehensive knowledge graph with billions of connected entities and relationships.",
-      uptime: "99.5%",
-      rating: "4.7",
-    },
-  ];
+  // Helper function to format large numbers
+  const formatNumber = (num) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + "M+";
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + "K+";
+    }
+    return num.toString();
+  };
 
   return (
     <>
@@ -141,8 +188,12 @@ const HomePage = () => {
           </div>
           <div className="hero-image">
             <img
-              src="/api/placeholder/600/400"
+              src="/assets/images/network-visualization.svg"
               alt="MCP Nexus Network Visualization"
+              onError={(e) => {
+                e.target.src =
+                  "https://via.placeholder.com/600x400?text=MCP+Nexus+Network";
+              }}
             />
           </div>
         </div>
@@ -153,19 +204,25 @@ const HomePage = () => {
           <h2 className="stats-title">Growing Decentralized Network</h2>
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-number">4,000+</div>
+              <div className="stat-number">
+                {formatNumber(networkStats.totalServers)}
+              </div>
               <div className="stat-label">MCP Servers Registered</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">12M+</div>
+              <div className="stat-number">
+                {formatNumber(networkStats.monthlyRequests)}
+              </div>
               <div className="stat-label">Monthly Requests</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">1,500+</div>
+              <div className="stat-number">
+                {formatNumber(networkStats.activeUsers)}
+              </div>
               <div className="stat-label">Active Developers</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">75+</div>
+              <div className="stat-number">{networkStats.countries}+</div>
               <div className="stat-label">Countries Represented</div>
             </div>
           </div>
@@ -263,8 +320,27 @@ const HomePage = () => {
               type="text"
               className="search-input"
               placeholder="Search for AI services, tools, or resources..."
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  window.location.href = `/explorer?q=${encodeURIComponent(
+                    e.target.value
+                  )}`;
+                }
+              }}
             />
-            <button className="search-button">
+            <button
+              className="search-button"
+              onClick={() => {
+                const input = document.querySelector(".search-input");
+                if (input && input.value) {
+                  window.location.href = `/explorer?q=${encodeURIComponent(
+                    input.value
+                  )}`;
+                } else {
+                  window.location.href = "/explorer";
+                }
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -287,11 +363,26 @@ const HomePage = () => {
               Featured MCP Servers
             </h3>
 
-            <div className="server-grid">
-              {featuredServers.map((server) => (
-                <ServerCard key={server.id} server={server} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="loading-center">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <div className="server-grid">
+                {featuredServers.length > 0 ? (
+                  featuredServers.map((server) => (
+                    <ServerCard key={server.id} server={server} />
+                  ))
+                ) : (
+                  <div className="no-servers">
+                    <p>No featured servers available at the moment.</p>
+                    <Link to="/explorer" className="btn btn-primary">
+                      Browse All Servers
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>

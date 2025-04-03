@@ -1,0 +1,20 @@
+/* src/components/common/ErrorMessage.css */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #fee2e2;
+  border-radius: 0.5rem;
+  color: #991b1b;
+  margin: 1rem 0;
+}
+
+.error-message svg {
+  flex-shrink: 0;
+}
+
+.error-message p {
+  margin: 0;
+  font-size: 0.938rem;
+}

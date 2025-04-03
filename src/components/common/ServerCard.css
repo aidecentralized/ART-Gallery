@@ -1,17 +1,24 @@
+/*src/components/common/ServerCard.css*/
+
 .server-card {
-  background: white;
+  background-color: #ffffff;
   border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
+  position: relative;
+  height: 100%;
 }
 
 .server-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.07), 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.server-card.compact {
+  padding: 1rem;
 }
 
 .server-header {
@@ -21,53 +28,78 @@
 }
 
 .server-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
   color: white;
   font-weight: bold;
+  font-size: 18px;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.server-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.compact .server-icon,
+.compact .server-logo {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
 }
 
 .server-name {
-  font-weight: 600;
+  margin: 0 0 0.25rem 0;
   font-size: 1.125rem;
-  color: var(--text);
-  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: #111827;
 }
 
 .server-provider {
   font-size: 0.875rem;
-  color: var(--text-light);
+  color: #6b7280;
 }
 
 .server-metadata {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
   flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .server-tag {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background: #f1f5f9;
-  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #f3f4f6;
+  color: #4b5563;
 }
 
 .server-tag.type {
-  background-color: rgba(80, 70, 229, 0.1);
-  color: var(--primary);
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.server-tag.more {
+  background-color: #e5e7eb;
+  color: #6b7280;
 }
 
 .server-info {
+  font-size: 0.938rem;
+  color: #4b5563;
+  line-height: 1.5;
   margin-bottom: 1.5rem;
-  color: var(--text-light);
-  font-size: 0.875rem;
   flex-grow: 1;
 }
 
@@ -75,17 +107,40 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.875rem;
+  margin-top: auto;
 }
 
 .server-connect {
-  color: var(--primary);
+  display: inline-block;
   font-weight: 500;
+  color: #2563eb;
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.server-connect:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
 .server-stats {
   display: flex;
   gap: 1rem;
-  color: var(--text-light);
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #059669;
+  font-weight: 500;
 }
