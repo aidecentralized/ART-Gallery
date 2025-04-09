@@ -4,17 +4,23 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background-color: #fee2e2;
-  border-radius: 0.5rem;
-  color: #991b1b;
+  background-color: rgba(254, 226, 226, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: var(--border-radius);
+  color: var(--danger);
   margin: 1rem 0;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
 }
 
 .error-message svg {
   flex-shrink: 0;
+  color: var(--danger);
 }
 
 .error-message p {
   margin: 0;
   font-size: 0.938rem;
+  line-height: 1.5;
 }

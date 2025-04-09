@@ -1,14 +1,56 @@
 :root {
-  --primary: #5046e5;
-  --primary-dark: #3832a0;
-  --secondary: #06b6d4;
-  --text: #1e293b;
-  --text-light: #64748b;
-  --bg: #ffffff;
-  --bg-alt: #f8fafc;
-  --success: #10b981;
+  /* MIT Crimson Color Palette */
+  --primary: #a31f34; /* MIT Crimson */
+  --primary-dark: #8a1a2a; /* Darker Crimson */
+  --primary-light: #c9234a; /* Lighter Crimson */
+  --primary-accent: #d64c60; /* Accent Crimson */
+  --primary-muted: rgba(
+    163,
+    31,
+    52,
+    0.15
+  ); /* Muted Crimson for subtle backgrounds */
+
+  /* Complementary Colors */
+  --secondary: #f2f3f4; /* Light Gray for contrast */
+  --secondary-dark: #e0e1e2; /* Darker Gray */
+  --secondary-light: #f8f9fa; /* Lighter Gray */
+
+  /* Text Colors */
+  --text: #1e1e1e; /* Dark text for readability */
+  --text-light: #4a4a4a; /* Lighter text */
+  --text-on-dark: #ffffff; /* White text for dark backgrounds */
+
+  /* Backgrounds */
+  --bg: rgba(255, 255, 255, 0.8); /* Glassmorphic background */
+  --bg-alt: rgba(245, 245, 245, 0.7); /* Alternate glassmorphic background */
+  --bg-solid: #ffffff; /* Solid background */
+
+  /* Functional Colors */
+  --success: #00843d; /* MIT green */
   --warning: #f59e0b;
   --danger: #ef4444;
+
+  /* Glassmorphism Properties */
+  --glass-blur: 12px; /* Blur effect for glassmorphism */
+  --glass-opacity: 0.8; /* Base opacity for glass elements */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3); /* Border for glass elements */
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Shadow for glass effect */
+
+  /* Border Radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius: 0.5rem;
+  --border-radius-lg: 0.75rem;
+
+  /* Box Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* Transitions */
+  --transition: all 0.3s ease;
 }
 
 * {
@@ -21,8 +63,30 @@
 
 body {
   color: var(--text);
-  background-color: var(--bg);
+  background-image: linear-gradient(135deg, #a31f34 0%, #8a1a2a 100%);
+  background-attachment: fixed;
   line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Glassmorphism utility classes */
+.glass {
+  background: rgba(255, 255, 255, var(--glass-opacity));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-dark {
+  background: rgba(26, 26, 26, var(--glass-opacity));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--glass-shadow);
+  color: var(--text-on-dark);
 }
 
 .container {
@@ -34,38 +98,66 @@ body {
 /* Button styles */
 .btn {
   display: inline-block;
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.375rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--border-radius);
   font-weight: 500;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: var(--transition);
   cursor: pointer;
+  letter-spacing: 0.3px;
 }
 
 .btn-primary {
   background-color: var(--primary);
   color: white;
   border: 1px solid var(--primary);
+  box-shadow: 0 2px 10px rgba(163, 31, 52, 0.25);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-dark);
   border-color: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(163, 31, 52, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn-outline {
   background-color: transparent;
   color: var(--primary);
   border: 1px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(163, 31, 52, 0.1);
 }
 
 .btn-outline:hover {
-  background-color: var(--primary);
-  color: white;
+  background-color: var(--primary-muted);
+  color: var(--primary-dark);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(163, 31, 52, 0.15);
 }
 
 .btn-lg {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 1.1rem;
+}
+
+/* Text utility classes */
+.text-primary {
+  color: var(--primary);
+}
+
+.text-secondary {
+  color: var(--text-light);
+}
+
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-light) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Responsive Design */

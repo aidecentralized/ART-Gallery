@@ -1,24 +1,46 @@
 /*src/components/common/ServerCard.css*/
 
 .server-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 8px 25px rgba(163, 31, 52, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 1.75rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   flex-direction: column;
   position: relative;
   height: 100%;
+  overflow: hidden;
+}
+
+.server-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-light),
+    var(--primary),
+    var(--primary-dark)
+  );
+  opacity: 0.8;
 }
 
 .server-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.07), 0 4px 6px rgba(0, 0, 0, 0.05);
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(163, 31, 52, 0.15),
+    0 8px 15px rgba(0, 0, 0, 0.08);
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .server-card.compact {
-  padding: 1rem;
+  padding: 1.25rem;
 }
 
 .server-header {
@@ -30,7 +52,7 @@
 .server-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,15 +61,23 @@
   font-size: 18px;
   margin-right: 1rem;
   flex-shrink: 0;
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
+  box-shadow: 0 3px 10px rgba(163, 31, 52, 0.15);
 }
 
 .server-logo {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   object-fit: cover;
   margin-right: 1rem;
   flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .compact .server-icon,
@@ -61,12 +91,12 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-dark);
 }
 
 .server-provider {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-light);
 }
 
 .server-metadata {
@@ -81,23 +111,32 @@
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  background-color: #f3f4f6;
-  color: #4b5563;
+  background: rgba(243, 244, 246, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--text-medium);
+  border: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .server-tag.type {
-  background-color: #dbeafe;
+  background: rgba(219, 234, 254, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   color: #1e40af;
+  border: 1px solid rgba(191, 219, 254, 0.5);
 }
 
 .server-tag.more {
-  background-color: #e5e7eb;
-  color: #6b7280;
+  background: rgba(229, 231, 235, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--text-medium);
+  border: 1px solid rgba(209, 213, 219, 0.5);
 }
 
 .server-info {
   font-size: 0.938rem;
-  color: #4b5563;
+  color: var(--text-medium);
   line-height: 1.5;
   margin-bottom: 1.5rem;
   flex-grow: 1;
@@ -108,19 +147,37 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .server-connect {
   display: inline-block;
   font-weight: 500;
-  color: #2563eb;
+  color: var(--primary);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: var(--transition);
+  position: relative;
+  padding: 2px 0;
+}
+
+.server-connect::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
 }
 
 .server-connect:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
+  color: var(--primary-dark);
+}
+
+.server-connect:hover::after {
+  width: 100%;
 }
 
 .server-stats {
@@ -128,7 +185,7 @@
   gap: 1rem;
   align-items: center;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-light);
 }
 
 .stat-item {
@@ -141,6 +198,6 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  color: #059669;
+  color: var(--success);
   font-weight: 500;
 }

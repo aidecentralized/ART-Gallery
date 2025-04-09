@@ -1,10 +1,13 @@
 header {
   padding: 1.25rem 0;
-  background-color: var(--bg);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: var(--glass-border);
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: var(--glass-shadow);
 }
 
 .header-inner {
@@ -20,35 +23,67 @@ header {
   font-size: 1.5rem;
   color: var(--primary);
   text-decoration: none;
+  transition: var(--transition);
+}
+
+.logo:hover {
+  transform: scale(1.02);
+  text-decoration: none;
 }
 
 .logo-icon {
   margin-right: 0.75rem;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   background: var(--primary);
   color: white;
+  box-shadow: 0 3px 10px rgba(163, 31, 52, 0.3);
+  transition: var(--transition);
+}
+
+.logo:hover .logo-icon {
+  transform: rotate(5deg);
+  box-shadow: 0 5px 15px rgba(163, 31, 52, 0.4);
 }
 
 nav ul {
   display: flex;
   list-style: none;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 nav a {
   color: var(--text);
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: var(--transition);
+  padding: 0.5rem 0;
+  position: relative;
+  white-space: nowrap;
+}
+
+nav a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
 }
 
 nav a:hover {
   color: var(--primary);
+  text-decoration: none;
+}
+
+nav a:hover::after {
+  width: 100%;
 }
 
 .nav-buttons {
@@ -56,8 +91,49 @@ nav a:hover {
   gap: 1rem;
 }
 
+.nav-buttons .btn-outline {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.nav-buttons .btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-buttons .btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.nav-buttons .btn-primary:hover::before {
+  left: 100%;
+}
+
 @media (max-width: 768px) {
   nav ul {
     display: none;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+  }
+
+  .nav-buttons {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
   }
 }
