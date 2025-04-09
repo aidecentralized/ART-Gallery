@@ -299,7 +299,12 @@ const HomePage = () => {
               src="/assets/images/network-visualization.svg"
               alt="MCP Nexus Network Visualization"
               onError={(e) => {
-                e.target.src = "/assets/images/network-fallback.png";
+                // Prevent infinite loops by checking if we're already using a fallback
+                if (!e.target.src.includes('fallback')) {
+                  // Use a data URI for a simple colored square as fallback
+                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%231a1a2e'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='14' fill='white' text-anchor='middle' dominant-baseline='middle'%3ENetwork Visualization%3C/text%3E%3C/svg%3E";
+                  e.target.onerror = null; // Prevent further error callbacks
+                }
               }}
             />
           </div>
