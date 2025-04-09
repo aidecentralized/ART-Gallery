@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Network Visualization -->
+    <g id="network" transform="translate(400, 300)">
+        <!-- Main network nodes and connections -->
+        <g id="nodes" fill="#dc143c">
+            <!-- Large nodes -->
+            <circle cx="0" cy="0" r="20" opacity="0.9"/>
+            <circle cx="-80" cy="-60" r="15" opacity="0.8"/>
+            <circle cx="80" cy="-40" r="18" opacity="0.85"/>
+            <circle cx="-60" cy="80" r="16" opacity="0.8"/>
+            <circle cx="70" cy="60" r="15" opacity="0.85"/>
+            <circle cx="-120" cy="-20" r="12" opacity="0.7"/>
+            <circle cx="110" cy="-10" r="14" opacity="0.75"/>
+            
+            <!-- Small nodes -->
+            <circle cx="140" cy="30" r="8" opacity="0.6"/>
+            <circle cx="160" cy="0" r="6" opacity="0.5"/>
+            <circle cx="170" cy="40" r="5" opacity="0.4"/>
+            <circle cx="180" cy="20" r="4" opacity="0.3"/>
+            <circle cx="190" cy="50" r="3" opacity="0.2"/>
+            <circle cx="200" cy="10" r="2" opacity="0.1"/>
+        </g>
+        
+        <!-- Network connections -->
+        <g id="connections" stroke="#dc143c" stroke-width="2">
+            <line x1="0" y1="0" x2="-80" y2="-60" opacity="0.6"/>
+            <line x1="0" y1="0" x2="80" y2="-40" opacity="0.6"/>
+            <line x1="0" y1="0" x2="-60" y2="80" opacity="0.6"/>
+            <line x1="0" y1="0" x2="70" y2="60" opacity="0.6"/>
+            <line x1="-80" y1="-60" x2="-120" y2="-20" opacity="0.4"/>
+            <line x1="80" y1="-40" x2="110" y2="-10" opacity="0.4"/>
+            <line x1="70" y1="60" x2="140" y2="30" opacity="0.3"/>
+            <line x1="140" y1="30" x2="160" y2="0" opacity="0.2"/>
+            <line x1="160" y1="0" x2="170" y2="40" opacity="0.2"/>
+            <line x1="170" y1="40" x2="180" y2="20" opacity="0.1"/>
+            <line x1="180" y1="20" x2="190" y2="50" opacity="0.1"/>
+            <line x1="190" y1="50" x2="200" y2="10" opacity="0.1"/>
+        </g>
+    </g>
+    
+    <!-- NANDA Text -->
+    <text x="400" y="600" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="100" fill="#dc143c">
+        NANDA
+    </text>
+</svg> 

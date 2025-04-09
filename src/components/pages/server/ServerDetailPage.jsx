@@ -48,6 +48,7 @@ const ServerDetailPage = () => {
 
   // State for server actions
   const [actionLoading, setActionLoading] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   // Fetch server data on mount
   useEffect(() => {
@@ -419,20 +420,14 @@ const ServerDetailPage = () => {
           </div>
 
           <div className="server-actions">
+            {/* Owner Actions for Editing and Management */}
             {isServerOwner() && (
               <div className="owner-actions">
                 <button
-                  className={`btn ${
-                    server.is_active ? "btn-danger" : "btn-success"
-                  }`}
-                  onClick={toggleServerStatus}
-                  disabled={actionLoading}
+                  className="btn btn-danger"
+                  onClick={() => setShowDeleteConfirmation(true)}
                 >
-                  {actionLoading
-                    ? "Processing..."
-                    : server.is_active
-                    ? "Deactivate"
-                    : "Activate"}
+                  Delete
                 </button>
                 {!server.verified && (
                   <button
@@ -443,12 +438,14 @@ const ServerDetailPage = () => {
                     Request Verification
                   </button>
                 )}
-                <Link to={`/servers/${id}/edit`} className="btn btn-outline">
+                <Link
+                  to={`/servers/${id}/edit`}
+                  className="btn btn-outline"
+                >
                   Edit Server
                 </Link>
               </div>
             )}
-            <button className="btn btn-primary">Connect to Server</button>
           </div>
         </div>
 
@@ -466,14 +463,6 @@ const ServerDetailPage = () => {
             onClick={() => setActiveTab("capabilities")}
           >
             Capabilities
-          </div>
-          <div
-            className={`server-tab ${
-              activeTab === "analytics" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("analytics")}
-          >
-            Analytics
           </div>
           <div
             className={`server-tab ${activeTab === "health" ? "active" : ""}`}
@@ -719,119 +708,6 @@ const ServerDetailPage = () => {
               ) : (
                 <div className="empty-state">
                   <p>No capabilities have been defined for this server.</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "analytics" && (
-            <div className="analytics-tab">
-              {analyticsLoading ? (
-                <div className="loading-centered">
-                  <LoadingSpinner />
-                </div>
-              ) : analyticsError ? (
-                <ErrorMessage message={analyticsError} />
-              ) : analytics ? (
-                <div className="analytics-content">
-                  <div className="analytics-header">
-                    <h2 className="analytics-title">Server Analytics</h2>
-                    <div className="analytics-period">
-                      <span>
-                        Period: {analytics.start_date} to {analytics.end_date}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="metrics-grid">
-                    <div className="metric-card">
-                      <div className="metric-value">
-                        {analytics.metrics.total_requests.toLocaleString()}
-                      </div>
-                      <div className="metric-label">Total Requests</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="metric-value">
-                        {analytics.metrics.unique_clients.toLocaleString()}
-                      </div>
-                      <div className="metric-label">Unique Clients</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="metric-value">
-                        {analytics.metrics.avg_response_time_ms.toFixed(2)} ms
-                      </div>
-                      <div className="metric-label">Avg Response Time</div>
-                    </div>
-                    <div className="metric-card">
-                      <div className="metric-value">
-                        {analytics.metrics.error_rate.toFixed(2)}%
-                      </div>
-                      <div className="metric-label">Error Rate</div>
-                    </div>
-                  </div>
-
-                  <div className="top-clients-capabilities">
-                    <div className="top-section">
-                      <h3 className="section-title">Top Clients</h3>
-                      <div className="top-list">
-                        {analytics.top_clients &&
-                        analytics.top_clients.length > 0 ? (
-                          analytics.top_clients.map((client, index) => (
-                            <div className="top-item" key={index}>
-                              <div className="top-name">{client.name}</div>
-                              <div className="top-count">
-                                {client.count} requests
-                              </div>
-                              <div className="top-percentage">
-                                ({client.percentage.toFixed(1)}%)
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <p>No client data available</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="top-section">
-                      <h3 className="section-title">Top Capabilities</h3>
-                      <div className="top-list">
-                        {analytics.top_capabilities &&
-                        analytics.top_capabilities.length > 0 ? (
-                          analytics.top_capabilities.map(
-                            (capability, index) => (
-                              <div className="top-item" key={index}>
-                                <div className="top-name">
-                                  {capability.name}
-                                </div>
-                                <div className="top-count">
-                                  {capability.count} requests
-                                </div>
-                                <div className="top-percentage">
-                                  ({capability.percentage.toFixed(1)}%)
-                                </div>
-                              </div>
-                            )
-                          )
-                        ) : (
-                          <p>No capability data available</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="time-series-charts">
-                    <h3 className="section-title">Time Series Data</h3>
-                    <p className="chart-placeholder">
-                      Charts would be displayed here with a charting library
-                      like recharts. The API provides time series data in
-                      analytics.time_series.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="empty-state">
-                  <p>No analytics data available for this server.</p>
                 </div>
               )}
             </div>

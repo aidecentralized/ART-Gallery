@@ -7,10 +7,20 @@
   --primary-accent: #d64c60; /* Accent Crimson */
   --primary-muted: rgba(163, 31, 52, 0.15); /* Muted Crimson */
 
+  /* Dark Mode Colors */
+  --dark-bg: #12141e;
+  --dark-card: #1a1d2d;
+  --dark-card-hover: #232738;
+  --dark-accent: #2d3748;
+  --dark-border: #374151;
+  
   /* Text Colors */
   --text-dark: #1e1e1e;
   --text-medium: #4a4a4a;
   --text-light: #6b7280;
+  --text-white: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-blue: #60a5fa;
 
   /* Glassmorphism Backgrounds */
   --gray-50: rgba(255, 255, 255, 0.8);
@@ -33,6 +43,7 @@
   --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
     0 4px 6px -2px rgba(163, 31, 52, 0.05);
   --box-shadow-inner: inset 0 2px 4px rgba(163, 31, 52, 0.06);
+  --box-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   /* Glassmorphism Properties */
   --glass-blur: 12px;
@@ -53,7 +64,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-medium);
-  background-image: linear-gradient(135deg, #a31f34 0%, #8a1a2a 100%);
+  background-color: var(--dark-bg);
+  background-image: linear-gradient(135deg, #1a1d2d 0%, #12141e 100%);
   background-attachment: fixed;
   line-height: 1.5;
 }
@@ -64,13 +76,13 @@ code {
 }
 
 a {
-  color: var(--primary-color);
+  color: var(--text-blue);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--primary-dark);
+  color: var(--primary-light);
   text-decoration: none;
 }
 
@@ -86,12 +98,11 @@ button {
 }
 
 .glass-container {
-  background: rgba(255, 255, 255, var(--glass-opacity));
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: var(--glass-border);
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
   border-radius: var(--border-radius-lg);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-dark);
+  color: var(--text-white);
 }
 
 /* Global utility classes */
@@ -142,25 +153,23 @@ button {
 .btn-outline {
   background-color: transparent;
   border: 1px solid var(--primary-color);
-  color: var(--primary-color);
+  color: var(--text-white);
 }
 
 .btn-outline:hover {
-  background-color: var(--primary-muted);
-  color: var(--primary-dark);
+  background-color: var(--dark-accent);
+  color: var(--primary-light);
 }
 
 .btn-glass {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: var(--primary-color);
+  background: var(--dark-accent);
+  border: 1px solid var(--dark-border);
+  color: var(--text-white);
 }
 
 .btn-glass:hover {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--dark-card-hover);
+  border: 1px solid var(--primary-color);
 }
 
 .btn:disabled {
@@ -177,16 +186,16 @@ button {
 }
 
 .card-glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  box-shadow: var(--box-shadow-dark);
+  color: var(--text-white);
 }
 
 .card-glass:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  background: var(--dark-card-hover);
 }
 
 /* Text gradients */

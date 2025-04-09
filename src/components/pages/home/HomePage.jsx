@@ -299,71 +299,16 @@ const HomePage = () => {
               src="/assets/images/network-visualization.svg"
               alt="MCP Nexus Network Visualization"
               onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/600x400?text=MCP+Nexus+Network";
+                e.target.src = "/assets/images/network-fallback.png";
               }}
             />
           </div>
         </div>
       </section>
 
-      <section ref={statsRef} className="stats slide-up-delayed">
-        <div className="container">
-          <h2 className="stats-title">Growing Decentralized Network</h2>
-          <div className="stats-grid">
-            <div className="stat-card hover-lift">
-              <div className="stat-number">
-                {formatNumber(animatedStats.totalServers)}
-              </div>
-              <div className="stat-label">MCP Servers Registered</div>
-              <div className="stat-progress">
-                <div 
-                  className="stat-progress-inner" 
-                  style={{ width: `${(animatedStats.totalServers / (networkStats.totalServers || 1250)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div className="stat-card hover-lift">
-              <div className="stat-number">
-                {formatNumber(animatedStats.monthlyRequests)}
-              </div>
-              <div className="stat-label">Monthly Requests</div>
-              <div className="stat-progress">
-                <div 
-                  className="stat-progress-inner" 
-                  style={{ width: `${(animatedStats.monthlyRequests / (networkStats.monthlyRequests || 45000)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div className="stat-card hover-lift">
-              <div className="stat-number">
-                {formatNumber(animatedStats.activeUsers)}
-              </div>
-              <div className="stat-label">Active Developers</div>
-              <div className="stat-progress">
-                <div 
-                  className="stat-progress-inner" 
-                  style={{ width: `${(animatedStats.activeUsers / (networkStats.activeUsers || 3200)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div className="stat-card hover-lift">
-              <div className="stat-number">{animatedStats.countries}+</div>
-              <div className="stat-label">Countries Represented</div>
-              <div className="stat-progress">
-                <div 
-                  className="stat-progress-inner" 
-                  style={{ width: `${(animatedStats.countries / (networkStats.countries || 75)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section ref={featuresRef} className="features">
         <div className="container">
-          <h2 className="section-title slide-up">Why MCP Nexus?</h2>
+          <h2 className="section-title slide-up">Why NANDA?</h2>
           <p className="section-subtitle slide-up-delayed">
             Build on a truly open protocol with no centralized control. Connect
             any Agent, Resource, or Tool through a standardized interface.

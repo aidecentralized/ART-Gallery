@@ -1,8 +1,21 @@
 import axios from "axios";
+import { refreshTokenDirect } from "./directApi";
+
+// Determine if we should use direct API or proxy
+const isDirectApiEnabled = () => {
+  // Check for environment variable or localStorage setting that might control this behavior
+  // This allows for quick switching between direct and proxy modes
+  return process.env.REACT_APP_USE_DIRECT_API === 'true' || 
+         localStorage.getItem('use_direct_api') === 'true';
+};
 
 // Create an axios instance with default config
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:80/api/v1",
+  // When using a proxy in package.json, use a relative URL for baseURL
+  // When using direct API, use the full Elastic Beanstalk URL
+  baseURL: isDirectApiEnabled() 
+    ? "http://nanda.us-east-2.elasticbeanstalk.com/api/v1" 
+    : "/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -36,20 +49,29 @@ apiClient.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        // Attempt to refresh the token - use the proper payload structure
-        const response = await axios.post(
-          `${apiClient.defaults.baseURL}/auth/refresh/`,
-          { refresh_token: refreshToken }
-        );
+        let newTokens;
+        if (isDirectApiEnabled()) {
+          // Use direct API for token refresh
+          newTokens = await refreshTokenDirect(refreshToken);
+        } else {
+          // Use proxy for token refresh
+          const response = await axios.post(
+            `/api/v1/auth/refresh/`,
+            { refresh: refreshToken }
+          );
+          newTokens = response.data;
+        }
 
         // Store the new tokens
-        localStorage.setItem("access_token", response.data.access_token);
-        if (response.data.refresh_token) {
-          localStorage.setItem("refresh_token", response.data.refresh_token);
+        if (newTokens.access) {
+          localStorage.setItem("access_token", newTokens.access);
+        }
+        if (newTokens.refresh) {
+          localStorage.setItem("refresh_token", newTokens.refresh);
         }
 
         // Update the authorization header
-        originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${newTokens.access || newTokens.access_token}`;
 
         // Retry the original request
         return apiClient(originalRequest);

@@ -19,60 +19,97 @@ export const serverApi = {
 
   // Register a new server
   registerServer: async (serverData) => {
-    const formData = new FormData();
-
-    // Add all fields to the formData
-    Object.keys(serverData).forEach((key) => {
-      // Handle array fields
-      if (Array.isArray(serverData[key])) {
-        serverData[key].forEach((value) => {
-          formData.append(`${key}`, value);
+    // Check if we need multipart/form-data (if there's a file upload)
+    const hasFile = serverData.logo instanceof File;
+    
+    // Ensure we have authentication token
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      throw new Error("Authentication required. Please log in.");
+    }
+    
+    try {
+      if (hasFile) {
+        const formData = new FormData();
+    
+        // Add all fields to the formData
+        Object.keys(serverData).forEach((key) => {
+          // Handle array fields
+          if (Array.isArray(serverData[key])) {
+            serverData[key].forEach((value) => {
+              formData.append(`${key}`, value);
+            });
+          }
+          // Handle nested objects (capabilities, usage_requirements)
+          else if (key === "capabilities" || key === "usage_requirements") {
+            formData.append(key, JSON.stringify(serverData[key]));
+          }
+          // Handle file upload (logo)
+          else if (key === "logo" && serverData[key] instanceof File) {
+            formData.append(key, serverData[key]);
+          }
+          // Handle other fields
+          else {
+            formData.append(key, serverData[key]);
+          }
+        });
+    
+        return await apiClient.post("/servers/", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`
+          },
+        });
+      } else {
+        // If no file, use regular JSON submission
+        return await apiClient.post("/servers/", serverData, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
         });
       }
-      // Handle nested objects (capabilities, usage_requirements)
-      else if (key === "capabilities" || key === "usage_requirements") {
-        formData.append(key, JSON.stringify(serverData[key]));
+    } catch (error) {
+      console.error("Server registration error:", error.response?.data || error.message);
+      // Rethrow the error with better information if available
+      if (error.response?.data?.message) {
+        error.message = error.response.data.message;
       }
-      // Handle file upload (logo)
-      else if (key === "logo" && serverData[key] instanceof File) {
-        formData.append(key, serverData[key]);
-      }
-      // Handle other fields
-      else {
-        formData.append(key, serverData[key]);
-      }
-    });
-
-    return await apiClient.post("/servers/", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      throw error;
+    }
   },
 
   // Update a server
   updateServer: async (id, serverData) => {
-    const formData = new FormData();
-
-    Object.keys(serverData).forEach((key) => {
-      if (Array.isArray(serverData[key])) {
-        serverData[key].forEach((value) => {
-          formData.append(`${key}`, value);
-        });
-      } else if (key === "capabilities" || key === "usage_requirements") {
-        formData.append(key, JSON.stringify(serverData[key]));
-      } else if (key === "logo" && serverData[key] instanceof File) {
-        formData.append(key, serverData[key]);
-      } else {
-        formData.append(key, serverData[key]);
-      }
-    });
-
-    return await apiClient.patch(`/servers/${id}/`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    // Check if we need multipart/form-data (if there's a file upload)
+    const hasFile = serverData.logo instanceof File;
+    
+    if (hasFile) {
+      const formData = new FormData();
+  
+      Object.keys(serverData).forEach((key) => {
+        if (Array.isArray(serverData[key])) {
+          serverData[key].forEach((value) => {
+            formData.append(`${key}`, value);
+          });
+        } else if (key === "capabilities" || key === "usage_requirements") {
+          formData.append(key, JSON.stringify(serverData[key]));
+        } else if (key === "logo" && serverData[key] instanceof File) {
+          formData.append(key, serverData[key]);
+        } else {
+          formData.append(key, serverData[key]);
+        }
+      });
+  
+      return await apiClient.patch(`/servers/${id}/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    } else {
+      // If no file, use regular JSON submission
+      return await apiClient.patch(`/servers/${id}/`, serverData);
+    }
   },
 
   // Delete a server

@@ -20,6 +20,8 @@ import LoginPage from "./components/pages/auth/LoginPage";
 import RegisterPage from "./components/pages/auth/RegisterPage";
 import DashboardPage from "./components/pages/dashboard/DashboardPage";
 import NotFoundPage from "./components/pages/NotFoundPage";
+import DocsPage from "./components/pages/DocsPage";
+import EditServerPage from "./components/pages/servers/EditServerPage";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -48,6 +50,7 @@ const App = () => {
             <Route path="servers/:id" element={<ServerDetailPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="docs" element={<DocsPage />} />
 
             {/* Protected routes */}
             <Route
@@ -70,7 +73,7 @@ const App = () => {
               path="servers/:id/edit"
               element={
                 <ProtectedRoute>
-                  <RegistryPage />
+                  <EditServerPage />
                 </ProtectedRoute>
               }
             />

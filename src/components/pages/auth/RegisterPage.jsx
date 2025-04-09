@@ -93,9 +93,21 @@ const RegisterPage = () => {
       return;
     }
 
+    // Log registration payload to console for debugging
+    const registrationData = {
+      email: formData.email,
+      password: formData.password,
+      password_confirm: formData.password_confirm,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      organization: formData.organization || undefined,
+    };
+    
+    console.log('Attempting registration with payload:', registrationData);
+
     setLoading(true);
     try {
-      await register(formData);
+      await register(registrationData);
 
       // Show success message and redirect to login
       alert(
@@ -105,8 +117,12 @@ const RegisterPage = () => {
     } catch (err) {
       console.error("Registration failed:", err);
 
+      // Check if this is a CORS error
+      if (err.message && (err.message.includes('CORS') || err.message.includes('Network Error'))) {
+        setError("Network error: CORS policy issue. Please try restarting the application with the proxy enabled.");
+      } 
       // Handle API validation errors
-      if (err.response?.data?.details) {
+      else if (err.response?.data?.details) {
         setErrors(err.response.data.details);
       } else {
         setError(err.message || "Registration failed. Please try again.");

@@ -31,8 +31,8 @@ const MainLayout = () => {
           <div className="header-content">
             <div className="header-left">
               <Link to="/" className="logo">
-                <img src="/assets/images/logo.svg" alt="MCP Nexus" />
-                <span className="logo-text">MCP Nexus</span>
+                <img src="/assets/images/logo.svg" alt="NANDA" className="logo-image" />
+                <span className="logo-text">NANDA</span>
               </Link>
 
               <nav className="desktop-nav">
@@ -52,9 +52,14 @@ const MainLayout = () => {
                 >
                   Register Server
                 </NavLink>
-                <a href="#" className="nav-link">
+                <NavLink
+                  to="/docs"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
                   Documentation
-                </a>
+                </NavLink>
               </nav>
             </div>
 
@@ -186,13 +191,15 @@ const MainLayout = () => {
               >
                 Register Server
               </NavLink>
-              <a
-                href="#"
-                className="mobile-nav-link"
+              <NavLink
+                to="/docs"
+                className={({ isActive }) =>
+                  isActive ? "mobile-nav-link active" : "mobile-nav-link"
+                }
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Documentation
-              </a>
+              </NavLink>
 
               {isAuthenticated ? (
                 <>
@@ -245,80 +252,18 @@ const MainLayout = () => {
 
       <footer className="main-footer">
         <div className="container">
-          <div className="footer-grid">
-            <div className="footer-brand">
+          <div className="footer-content">
               <Link to="/" className="footer-logo">
-                <img src="/assets/images/logo.svg" alt="MCP Nexus" />
-                <span className="footer-logo-text">MCP Nexus</span>
+              <img src="/assets/images/logo.svg" alt="NANDA" className="footer-logo-image" />
+              <span className="footer-logo-text">NANDA</span>
               </Link>
-              <p className="footer-tagline">
-                The open registry for AI communication
-              </p>
-            </div>
-
-            <div className="footer-links-group">
-              <h3 className="footer-title">Platform</h3>
-              <ul className="footer-links">
-                <li>
-                  <Link to="/explorer">Explorer</Link>
-                </li>
-                <li>
-                  <Link to="/registry">Register Server</Link>
-                </li>
-                <li>
-                  <a href="#">API Documentation</a>
-                </li>
-                <li>
-                  <a href="#">SDK & Libraries</a>
-                </li>
-              </ul>
-            </div>
-
-            <div className="footer-links-group">
-              <h3 className="footer-title">Resources</h3>
-              <ul className="footer-links">
-                <li>
-                  <a href="#">Documentation</a>
-                </li>
-                <li>
-                  <a href="#">Tutorials</a>
-                </li>
-                <li>
-                  <a href="#">Blog</a>
-                </li>
-                <li>
-                  <a href="#">Community</a>
-                </li>
-              </ul>
-            </div>
-
-            <div className="footer-links-group">
-              <h3 className="footer-title">Company</h3>
-              <ul className="footer-links">
-                <li>
-                  <a href="#">About</a>
-                </li>
-                <li>
-                  <a href="#">Team</a>
-                </li>
-                <li>
-                  <a href="#">Careers</a>
-                </li>
-                <li>
-                  <a href="#">Contact</a>
-                </li>
-              </ul>
-            </div>
+            <p className="footer-description">
+              The revolutionary hub for MCP agents, empowering AI systems with a powerful registry 
+              of decentralized tools, resources, and capabilities. Transforming how intelligence connects.
+            </p>
           </div>
-
-          <div className="footer-bottom">
-            <div className="footer-copyright">
-              &copy; {new Date().getFullYear()} MCP Nexus. All rights reserved.
-            </div>
-            <div className="footer-legal">
-              <a href="#">Terms of Service</a>
-              <a href="#">Privacy Policy</a>
-            </div>
+          <div className="copyright">
+            &copy; {new Date().getFullYear()} NANDA. All rights reserved.
           </div>
         </div>
       </footer>

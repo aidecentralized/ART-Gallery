@@ -39,6 +39,9 @@ const RegistryPage = () => {
   // Validation state
   const [errors, setErrors] = useState({});
 
+  // Add state for terms agreement
+  const [termsAgreed, setTermsAgreed] = useState(false);
+
   // Redirect if not logged in
   useEffect(() => {
     if (!isAuthenticated) {
@@ -190,6 +193,11 @@ const RegistryPage = () => {
     }));
   };
 
+  // Handle terms agreement change
+  const handleTermsChange = (e) => {
+    setTermsAgreed(e.target.checked);
+  };
+
   // Validate form
   const validateBasicInfo = () => {
     const newErrors = {};
@@ -232,8 +240,17 @@ const RegistryPage = () => {
       newErrors.contact_email = "Invalid email format";
     }
 
-    if (serverData.types.length === 0) {
+    // Make sure at least one server type is selected
+    if (!serverData.types || serverData.types.length === 0) {
       newErrors.types = "At least one server type is required";
+      
+      // Ensure we have a default type if none is selected
+      if (!serverData.types || serverData.types.length === 0) {
+        setServerData((prev) => ({
+          ...prev,
+          types: ["agent"]  // Set default type to ensure API doesn't reject the request
+        }));
+      }
     }
 
     setErrors(newErrors);
@@ -264,29 +281,143 @@ const RegistryPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check terms agreement
+    if (!termsAgreed) {
+      setError("You must agree to the terms before submitting");
+      return;
+    }
+
     // Final validation
     if (!validateBasicInfo()) {
       return;
     }
 
+    // Ensure we have at least one server type before submitting
+    if (!serverData.types || serverData.types.length === 0) {
+      setServerData(prev => ({
+        ...prev,
+        types: ["agent"]
+      }));
+      // Small timeout to ensure state is updated before proceeding
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
     setLoading(true);
     setError(null);
 
-    try {
-      const response = await serverApi.registerServer(serverData);
+    // Create a sanitized copy of the data to send
+    const sanitizedData = {
+      name: serverData.name.trim(),
+      slug: serverData.slug.trim(),
+      description: serverData.description.trim(),
+      url: serverData.url.trim(),
+      provider: serverData.provider.trim(),
+      contact_email: serverData.contact_email.trim(),
+      
+      // Handle optional fields with reasonable defaults
+      documentation_url: serverData.documentation_url ? serverData.documentation_url.trim() : "",
+      
+      // Ensure types is an array with at least one value
+      types: serverData.types && serverData.types.length > 0 ? serverData.types : ["agent"],
+      
+      // Ensure tags is always an array
+      tags: Array.isArray(serverData.tags) ? serverData.tags : [],
+      
+      // Only include logo if it's a valid file
+      ...(serverData.logo instanceof File ? { logo: serverData.logo } : {}),
+      
+      // Format capabilities properly
+      capabilities: Array.isArray(serverData.capabilities) ? 
+        serverData.capabilities.map(cap => ({
+          name: cap.name?.trim() || "",
+          description: cap.description?.trim() || "",
+          type: cap.type || "agent"
+        })) : [],
+      
+      // Format usage requirements properly
+      usage_requirements: {
+        authentication_required: Boolean(serverData.usage_requirements?.authentication_required),
+        authentication_type: serverData.usage_requirements?.authentication_type || "none",
+        rate_limits: serverData.usage_requirements?.rate_limits?.trim() || "",
+        pricing: serverData.usage_requirements?.pricing?.trim() || ""
+      }
+    };
 
-      // Redirect to the server detail page or dashboard
-      navigate(`/servers/${response.data.id}`);
+    // Debug: log the server data being sent
+    console.log("Submitting server data:", JSON.stringify(sanitizedData, null, 2));
+    
+    try {
+      const response = await serverApi.registerServer(sanitizedData);
+      console.log("Server registration successful:", response.data);
+      
+      // Show success message
+      const successMessage = document.createElement('div');
+      successMessage.className = 'success-overlay';
+      successMessage.innerHTML = `
+        <div class="success-modal">
+          <div class="success-icon">✓</div>
+          <h2>Server Registered Successfully!</h2>
+          <p>Your MCP server "${serverData.name}" has been registered.</p>
+          <p>Redirecting to dashboard...</p>
+        </div>
+      `;
+      document.body.appendChild(successMessage);
+      
+      // Redirect to the dashboard after a short delay
+      setTimeout(() => {
+        navigate('/dashboard/servers');
+      }, 2000);
     } catch (err) {
       console.error("Server registration failed:", err);
+      
+      // Enhanced error logging
+      console.error("Error details:", {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        message: err.message,
+        config: {
+          url: err.config?.url,
+          method: err.config?.method,
+          headers: err.config?.headers
+        }
+      });
 
+      // Log full validation error details
+      if (err.response?.data?.code === 'validation_error') {
+        console.error("VALIDATION ERROR DETAILS:", JSON.stringify(err.response?.data, null, 2));
+        
+        // Display validation errors in a more readable format
+        let validationMessage = "Validation failed. The server reported these issues:";
+        
+        if (err.response?.data?.details) {
+          const details = err.response.data.details;
+          Object.keys(details).forEach(key => {
+            validationMessage += `\n- ${key}: ${details[key]}`;
+          });
+          setError(validationMessage);
+        } else {
+          setError("Validation failed but the server didn't provide specific details.");
+        }
+      }
       // Handle specific validation errors from the API
       if (err.response?.data?.details) {
         setErrors(err.response.data.details);
+        setError("Please fix the validation errors below.");
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.response?.status === 401 || err.message === "Authentication required. Please log in.") {
+        setError("You must be logged in to register a server. Please log in and try again.");
+        // Redirect to login after a delay
+        setTimeout(() => {
+          navigate('/login?redirect=/registry');
+        }, 3000);
+      } else if (err.response?.status === 400) {
+        // More specific 400 Bad Request handling
+        setError("The server rejected the registration. Please check that all required fields are filled correctly.");
       } else {
         setError(
-          err.response?.data?.message ||
-            "Failed to register server. Please try again."
+          "Failed to register server. Please try again or contact support."
         );
       }
     } finally {
@@ -1089,7 +1220,12 @@ const RegistryPage = () => {
 
           <div className="terms-agreement">
             <div className="checkbox-wrapper">
-              <input type="checkbox" id="terms_agreement" />
+              <input 
+                type="checkbox" 
+                id="terms_agreement" 
+                checked={termsAgreed}
+                onChange={handleTermsChange}
+              />
               <label htmlFor="terms_agreement">
                 I confirm that the information provided is accurate and that I
                 have the authority to register this MCP server.

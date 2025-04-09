@@ -1,6 +1,7 @@
 // src/context/AuthContext.js
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { authApi } from "../api";
+import apiClient from "../api/client";
 
 // Create the context
 export const AuthContext = createContext(null);
@@ -95,6 +96,10 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       try {
+        // Send the updated user data to the backend
+        await authApi.updateUser(userData);
+        
+        // Fetch the updated user data
         const response = await authApi.getCurrentUser();
         setCurrentUser(response.data);
         return response.data;
