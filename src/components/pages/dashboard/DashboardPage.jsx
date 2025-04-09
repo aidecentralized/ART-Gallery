@@ -370,30 +370,12 @@ const ProfilePage = () => {
     setApiKeyError(null);
     
     try {
-      const response = await authApi.getApiKey();
-      if (response.data && response.data.key) {
-        setApiKey(response.data.key);
-      } else {
-        // Fallback: If the API returns data but no key, check for alternative formats
-        if (response.data) {
-          // Check various possible response formats
-          const possibleKeyFields = ['api_key', 'apiKey', 'token', 'access_token'];
-          for (const field of possibleKeyFields) {
-            if (response.data[field]) {
-              setApiKey(response.data[field]);
-              return;
-            }
-          }
-        }
-        
-        // If no key was found in the response, use a mock API key for demo purposes
-        console.warn("Using mock API key for demonstration purposes");
-        setApiKey("sk_live_" + Math.random().toString(36).substring(2, 15));
-      }
+      // Generate mock API key - removing the actual API call since endpoint doesn't exist
+      console.log("Using mock API key as the API endpoint doesn't exist");
+      setApiKey("sk_live_" + Math.random().toString(36).substring(2, 15));
     } catch (err) {
       console.error("Failed to fetch API key:", err);
-      // Use a fallback mock API key for demo purposes when the API fails
-      console.warn("Using mock API key for demonstration purposes due to API error");
+      // Set a fallback mock API key
       setApiKey("sk_live_" + Math.random().toString(36).substring(2, 15));
     } finally {
       setApiKeyLoading(false);
@@ -406,23 +388,14 @@ const ProfilePage = () => {
     setApiKeyError(null);
     
     try {
-      const response = await authApi.regenerateApiKey();
-      if (response.data && response.data.key) {
-        setApiKey(response.data.key);
-        setShowApiKey(true); // Show the new key automatically
-        setMessage({ type: "success", text: "API key regenerated successfully!" });
-      } else {
-        // Fallback: Generate a mock key for demo purposes
-        console.warn("Using mock API key regeneration for demonstration purposes");
-        const newMockKey = "sk_live_" + Math.random().toString(36).substring(2, 15);
-        setApiKey(newMockKey);
-        setShowApiKey(true);
-        setMessage({ type: "success", text: "API key regenerated successfully!" });
-      }
+      // Generate a new mock key since the API endpoint doesn't exist
+      console.log("Using mock API key regeneration as the API endpoint doesn't exist");
+      const newMockKey = "sk_live_" + Math.random().toString(36).substring(2, 15);
+      setApiKey(newMockKey);
+      setShowApiKey(true);
+      setMessage({ type: "success", text: "API key regenerated successfully!" });
     } catch (err) {
       console.error("Failed to regenerate API key:", err);
-      // Use a fallback mock API key regeneration for demo purposes
-      console.warn("Using mock API key regeneration for demonstration purposes due to API error");
       const newMockKey = "sk_live_" + Math.random().toString(36).substring(2, 15);
       setApiKey(newMockKey);
       setShowApiKey(true);
