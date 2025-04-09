@@ -296,7 +296,7 @@ const HomePage = () => {
           </div>
           <div className="hero-image float-animation">
             <img
-              src="/assets/images/network-visualization.svg"
+              src="/assets/images/network-visualization.png"
               alt="MCP Nexus Network Visualization"
               onError={(e) => {
                 // Prevent infinite loops by checking if we're already using a fallback
