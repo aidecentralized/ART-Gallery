@@ -11,11 +11,8 @@ const isDirectApiEnabled = () => {
 
 // Create an axios instance with default config
 const apiClient = axios.create({
-  // When using a proxy in package.json, use a relative URL for baseURL
-  // When using direct API, use the full Elastic Beanstalk URL
-  baseURL: isDirectApiEnabled() 
-    ? "http://nanda.us-east-2.elasticbeanstalk.com/api/v1" 
-    : "/api/v1",
+  // Always use the Elastic Beanstalk URL to ensure it works in all environments
+  baseURL: "http://nanda.us-east-2.elasticbeanstalk.com/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -50,18 +47,9 @@ apiClient.interceptors.response.use(
         }
 
         let newTokens;
-        if (isDirectApiEnabled()) {
-          // Use direct API for token refresh
-          newTokens = await refreshTokenDirect(refreshToken);
-        } else {
-          // Use proxy for token refresh
-          const response = await axios.post(
-            `/api/v1/auth/refresh/`,
-            { refresh: refreshToken }
-          );
-          newTokens = response.data;
-        }
-
+        // Always use direct API for token refresh
+        newTokens = await refreshTokenDirect(refreshToken);
+        
         // Store the new tokens
         if (newTokens.access) {
           localStorage.setItem("access_token", newTokens.access);
