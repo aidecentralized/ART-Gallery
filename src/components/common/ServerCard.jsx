@@ -43,7 +43,6 @@ const ServerCard = ({ server, compact = false }) => {
     provider,
     description,
     rating = 0,
-    uptime = "N/A",
     verified = false,
     types = [],
     tags = [],
@@ -62,6 +61,10 @@ const ServerCard = ({ server, compact = false }) => {
 
   // Format tags as needed
   const formattedTags = Array.isArray(tags) ? tags : server.tags || [];
+
+  // Format rating display
+  const formattedRating = typeof rating === "number" ? rating.toFixed(1) : rating;
+  const ratingColor = rating >= 4 ? "#4caf50" : rating >= 2.5 ? "#ff9800" : "#f44336";
 
   return (
     <div className={`server-card ${compact ? "compact" : ""}`}>
@@ -97,7 +100,7 @@ const ServerCard = ({ server, compact = false }) => {
         <div className="server-info">
           {description && description.length > 150
             ? `${description.substring(0, 150)}...`
-            : description}
+            : description || "No description available."}
         </div>
       )}
 
@@ -107,9 +110,8 @@ const ServerCard = ({ server, compact = false }) => {
         </Link>
 
         <div className="server-stats">
-          <span className="stat-item">{uptime} Uptime</span>
-          <span className="stat-item">
-            ★ {typeof rating === "number" ? rating.toFixed(1) : rating}
+          <span className="stat-item" style={{ color: ratingColor }}>
+            <span className="star-icon">★</span> {formattedRating}
           </span>
           {verified && (
             <span className="verified-badge">
