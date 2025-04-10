@@ -9,7 +9,7 @@ import axios from "axios";
 // CORS-enabled client with credentials
 const createDirectClient = () => {
   return axios.create({
-    baseURL: "http://https://nanda-registry.com/api/v1",
+    baseURL: "https://nanda-registry.com/api/v1",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",

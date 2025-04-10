@@ -42,5 +42,5 @@
   "devDependencies": {
     "concurrently": "^8.0.1"
   },
-  "proxy": "http://https://nanda-registry.com"
+  "proxy": "https://nanda-registry.com"
 }

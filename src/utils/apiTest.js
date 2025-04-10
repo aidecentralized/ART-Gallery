@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Helper for direct API calls
 const directApi = axios.create({
-  baseURL: "http://https://nanda-registry.com/api/v1",
+  baseURL: "https://nanda-registry.com/api/v1",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -23,9 +23,7 @@ export const testApiConnection = async (useDirect = false) => {
         useDirect ? "direct NANDA backend" : "proxy API"
       }...`
     );
-    const baseUrl = useDirect
-      ? "http://https://nanda-registry.com/api/v1"
-      : "/api/v1";
+    const baseUrl = useDirect ? "https://nanda-registry.com/api/v1" : "/api/v1";
 
     // Use the appropriate client
     const client = useDirect ? directApi : axios;
@@ -76,9 +74,7 @@ export const testApiConnection = async (useDirect = false) => {
  */
 export const testRegistration = async (userData, useDirect = false) => {
   try {
-    const baseUrl = useDirect
-      ? "http://https://nanda-registry.com/api/v1"
-      : "/api/v1";
+    const baseUrl = useDirect ? "https://nanda-registry.com/api/v1" : "/api/v1";
     const client = useDirect ? directApi : axios;
 
     // Ensure password_confirm is included
@@ -127,9 +123,7 @@ export const testRegistration = async (userData, useDirect = false) => {
  */
 export const testLogin = async (email, password, useDirect = false) => {
   try {
-    const baseUrl = useDirect
-      ? "http://https://nanda-registry.com/api/v1"
-      : "/api/v1";
+    const baseUrl = useDirect ? "https://nanda-registry.com/api/v1" : "/api/v1";
     const client = useDirect ? directApi : axios;
 
     console.log(

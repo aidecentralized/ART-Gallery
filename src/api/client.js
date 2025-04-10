@@ -14,7 +14,7 @@ const isDirectApiEnabled = () => {
 // Create an axios instance with default config
 const apiClient = axios.create({
   // Always use the Elastic Beanstalk URL to ensure it works in all environments
-  baseURL: "http://https://nanda-registry.com/api/v1",
+  baseURL: "https://nanda-registry.com/api/v1",
   headers: {
     "Content-Type": "application/json",
   },

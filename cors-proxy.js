@@ -23,7 +23,7 @@ app.use((req, res, next) => {
 
 // Create a proxy middleware for the API
 const apiProxy = createProxyMiddleware({
-  target: "http://https://nanda-registry.com",
+  target: "https://nanda-registry.com",
   changeOrigin: true,
   pathRewrite: {
     "^/api": "/api", // Don't rewrite the path
@@ -48,7 +48,7 @@ const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => {
   console.log(`CORS Proxy server is running on port ${PORT}`);
   console.log(
-    `Proxying requests from http://localhost:${PORT}/api to http://https://nanda-registry.com/api`
+    `Proxying requests from http://localhost:${PORT}/api to https://nanda-registry.com/api`
   );
   console.log(
     `To use this proxy, set REACT_APP_API_URL=http://localhost:${PORT}/api in your .env file`

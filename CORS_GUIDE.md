@@ -16,7 +16,7 @@ The simplest way to bypass CORS issues in development is to use the proxy featur
 
 ```json
 {
-  "proxy": "http://https://nanda-registry.com"
+  "proxy": "https://nanda-registry.com"
 }
 ```
 
