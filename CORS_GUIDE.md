@@ -16,7 +16,7 @@ The simplest way to bypass CORS issues in development is to use the proxy featur
 
 ```json
 {
-  "proxy": "http://nanda.us-east-2.elasticbeanstalk.com"
+  "proxy": "http://https://nanda-registry.com"
 }
 ```
 
@@ -27,11 +27,13 @@ This will automatically proxy all relative API requests (like `/api/auth/registe
 For cases where the built-in proxy doesn't work, we've created a custom proxy server:
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Run the proxy server:
+
    ```bash
    npm run proxy
    ```
@@ -42,6 +44,7 @@ For cases where the built-in proxy doesn't work, we've created a custom proxy se
    ```
 
 Or run both simultaneously:
+
 ```bash
 npm run dev
 ```
@@ -63,4 +66,4 @@ If you're still encountering CORS issues:
 
 ## Production Deployment
 
-For production deployment, you'll need to properly configure the NANDA backend to allow requests from your production domain, or set up a proper API proxy on your server. 
+For production deployment, you'll need to properly configure the NANDA backend to allow requests from your production domain, or set up a proper API proxy on your server.

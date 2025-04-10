@@ -42,5 +42,5 @@
   "devDependencies": {
     "concurrently": "^8.0.1"
   },
-  "proxy": "http://nanda.us-east-2.elasticbeanstalk.com"
+  "proxy": "http://https://nanda-registry.com"
 }
