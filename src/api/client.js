@@ -5,14 +5,16 @@ import { refreshTokenDirect } from "./directApi";
 const isDirectApiEnabled = () => {
   // Check for environment variable or localStorage setting that might control this behavior
   // This allows for quick switching between direct and proxy modes
-  return process.env.REACT_APP_USE_DIRECT_API === 'true' || 
-         localStorage.getItem('use_direct_api') === 'true';
+  return (
+    process.env.REACT_APP_USE_DIRECT_API === "true" ||
+    localStorage.getItem("use_direct_api") === "true"
+  );
 };
 
 // Create an axios instance with default config
 const apiClient = axios.create({
   // Always use the Elastic Beanstalk URL to ensure it works in all environments
-  baseURL: "http://nanda.us-east-2.elasticbeanstalk.com/api/v1",
+  baseURL: "https://nanda-registry.com/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -49,7 +51,7 @@ apiClient.interceptors.response.use(
         let newTokens;
         // Always use direct API for token refresh
         newTokens = await refreshTokenDirect(refreshToken);
-        
+
         // Store the new tokens
         if (newTokens.access) {
           localStorage.setItem("access_token", newTokens.access);
@@ -59,7 +61,9 @@ apiClient.interceptors.response.use(
         }
 
         // Update the authorization header
-        originalRequest.headers.Authorization = `Bearer ${newTokens.access || newTokens.access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${
+          newTokens.access || newTokens.access_token
+        }`;
 
         // Retry the original request
         return apiClient(originalRequest);

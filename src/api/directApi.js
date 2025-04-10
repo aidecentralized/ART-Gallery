@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * This file contains direct API calls that bypass the proxy.
@@ -9,10 +9,10 @@ import axios from 'axios';
 // CORS-enabled client with credentials
 const createDirectClient = () => {
   return axios.create({
-    baseURL: 'http://nanda.us-east-2.elasticbeanstalk.com/api/v1',
+    baseURL: "https://nanda-registry.com/api/v1",
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     withCredentials: false, // Set to true only if the server supports credentials with CORS
   });
@@ -28,16 +28,17 @@ export const registerWithJsonp = (userData) => {
   return new Promise((resolve, reject) => {
     try {
       // Log the attempt
-      console.log('Attempting direct registration with:', userData);
-      
+      console.log("Attempting direct registration with:", userData);
+
       // First try a normal request with our directClient
-      directClient.post('/auth/register/', userData)
-        .then(response => {
-          console.log('Registration successful via direct API call');
+      directClient
+        .post("/auth/register/", userData)
+        .then((response) => {
+          console.log("Registration successful via direct API call");
           resolve(response.data);
         })
-        .catch(error => {
-          console.error('Direct registration failed, error:', error);
+        .catch((error) => {
+          console.error("Direct registration failed, error:", error);
           reject(error);
         });
     } catch (error) {
@@ -51,9 +52,12 @@ export const registerWithJsonp = (userData) => {
  */
 export const loginDirect = async (email, password) => {
   try {
-    const response = await directClient.post('/auth/token/', { email, password });
-    console.log('Login successful via direct API call:', response.data);
-    
+    const response = await directClient.post("/auth/token/", {
+      email,
+      password,
+    });
+    console.log("Login successful via direct API call:", response.data);
+
     // Properly handle the token response structure
     if (response.data.access) {
       localStorage.setItem("access_token", response.data.access);
@@ -61,10 +65,10 @@ export const loginDirect = async (email, password) => {
     if (response.data.refresh) {
       localStorage.setItem("refresh_token", response.data.refresh);
     }
-    
+
     return response.data;
   } catch (error) {
-    console.error('Direct login failed, error:', error);
+    console.error("Direct login failed, error:", error);
     throw error;
   }
 };
@@ -74,7 +78,9 @@ export const loginDirect = async (email, password) => {
  */
 export const refreshTokenDirect = async (refreshToken) => {
   try {
-    const response = await directClient.post('/auth/refresh/', { refresh_token: refreshToken });
+    const response = await directClient.post("/auth/refresh/", {
+      refresh_token: refreshToken,
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -84,5 +90,5 @@ export const refreshTokenDirect = async (refreshToken) => {
 export default {
   registerWithJsonp,
   loginDirect,
-  refreshTokenDirect
-}; 
+  refreshTokenDirect,
+};
