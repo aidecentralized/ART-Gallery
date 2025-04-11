@@ -1,6 +1,6 @@
 // src/components/pages/server/ServerDetailPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { serverApi, verificationApi, analyticsApi } from "../../../api";
 import { useAuth } from "../../../context/AuthContext";
 import LoadingSpinner from "../../common/LoadingSpinner";
@@ -12,6 +12,7 @@ import VerificationStatus from "./verification/VerificationStatus";
 const ServerDetailPage = () => {
   const { id } = useParams();
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   // State for server data
   const [server, setServer] = useState(null);
@@ -49,6 +50,9 @@ const ServerDetailPage = () => {
   // State for server actions
   const [actionLoading, setActionLoading] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(null);
 
   // Fetch server data on mount
   useEffect(() => {
@@ -333,6 +337,33 @@ const ServerDetailPage = () => {
     return stars;
   };
 
+  // Handle server deletion
+  const handleDeleteServer = async () => {
+    if (!server || !isServerOwner()) return;
+    
+    setDeleteLoading(true);
+    setDeleteError(null);
+    
+    try {
+      await serverApi.deleteServer(id);
+      setDeleteSuccess("Server deleted successfully");
+      
+      // Close the confirmation modal
+      setShowDeleteConfirmation(false);
+      
+      // Wait a moment before redirecting to dashboard
+      setTimeout(() => {
+        navigate("/dashboard/servers");
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to delete server:", err);
+      setDeleteError("Failed to delete server. Please try again.");
+      setShowDeleteConfirmation(false);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="container">
@@ -361,6 +392,13 @@ const ServerDetailPage = () => {
       <div className="server-header-bg"></div>
 
       <div className="container">
+        {deleteSuccess && (
+          <div className="message success">{deleteSuccess}</div>
+        )}
+        {deleteError && (
+          <div className="message error">{deleteError}</div>
+        )}
+        
         <div className="server-header">
           <div className="server-identity">
             {server.logo_url ? (
@@ -933,6 +971,36 @@ const ServerDetailPage = () => {
           status={verificationStatus}
           onClose={() => setShowVerificationStatus(false)}
         />
+      )}
+      
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h3>Confirm Delete</h3>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete this server? This action cannot be undone.</p>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn btn-outline" 
+                onClick={() => setShowDeleteConfirmation(false)}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-danger" 
+                onClick={handleDeleteServer}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? "Deleting..." : "Delete Server"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -326,13 +326,8 @@ const RegistryPage = () => {
       // Only include logo if it's a valid file
       ...(serverData.logo instanceof File ? { logo: serverData.logo } : {}),
       
-      // Format capabilities properly
-      capabilities: Array.isArray(serverData.capabilities) ? 
-        serverData.capabilities.map(cap => ({
-          name: cap.name?.trim() || "",
-          description: cap.description?.trim() || "",
-          type: cap.type || "agent"
-        })) : [],
+      // Set capabilities to an empty array
+      capabilities: [],
       
       // Format usage requirements properly
       usage_requirements: {
@@ -727,82 +722,6 @@ const RegistryPage = () => {
         </div>
         <div className="card-body">
           <div className="section-header">
-            <h3>Server Capabilities</h3>
-            <p>Define the capabilities your MCP server provides</p>
-          </div>
-
-          {/* Capabilities section - simplified for this initial implementation */}
-          <div className="capabilities-list">
-            {serverData.capabilities.length === 0 ? (
-              <div className="empty-state">
-                <p>
-                  No capabilities defined yet. Add your first capability below.
-                </p>
-              </div>
-            ) : (
-              <div className="capability-cards">
-                {serverData.capabilities.map((capability, index) => (
-                  <div className="capability-card" key={index}>
-                    <h4>{capability.name}</h4>
-                    <p>{capability.description}</p>
-                    <div className="capability-footer">
-                      <span className="capability-type">{capability.type}</span>
-                      <button
-                        className="remove-capability"
-                        onClick={() => {
-                          const updatedCapabilities = [
-                            ...serverData.capabilities,
-                          ];
-                          updatedCapabilities.splice(index, 1);
-                          setServerData((prev) => ({
-                            ...prev,
-                            capabilities: updatedCapabilities,
-                          }));
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Add capability form - simplified */}
-          <div className="add-capability-form">
-            <h4>Add Capability</h4>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="capability_name">Name*</label>
-                <input
-                  type="text"
-                  id="capability_name"
-                  placeholder="e.g., TextProcessing"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="capability_type">Type*</label>
-                <select id="capability_type">
-                  <option value="agent">Agent</option>
-                  <option value="resource">Resource</option>
-                  <option value="tool">Tool</option>
-                </select>
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="capability_description">Description*</label>
-              <textarea
-                id="capability_description"
-                placeholder="Describe what this capability does..."
-              ></textarea>
-            </div>
-            <button className="btn btn-secondary">Add Capability</button>
-          </div>
-
-          <div className="section-divider"></div>
-
-          <div className="section-header">
             <h3>Usage Requirements</h3>
             <p>Define how others can use your MCP server</p>
           </div>
@@ -1164,23 +1083,6 @@ const RegistryPage = () => {
           <div className="review-section">
             <h3>Description</h3>
             <p className="review-description">{serverData.description}</p>
-          </div>
-
-          <div className="review-section">
-            <h3>Capabilities</h3>
-            {serverData.capabilities.length > 0 ? (
-              <div className="review-capabilities">
-                {serverData.capabilities.map((capability, index) => (
-                  <div className="review-capability" key={index}>
-                    <h4>{capability.name}</h4>
-                    <p>{capability.description}</p>
-                    <span className="capability-type">{capability.type}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>No capabilities defined.</p>
-            )}
           </div>
 
           <div className="review-section">
