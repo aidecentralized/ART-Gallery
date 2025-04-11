@@ -18,6 +18,9 @@
   z-index: 0;
 }
 
+
+
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -1080,4 +1083,9 @@
   color: rgba(255, 255, 255, 0.8);
   margin-top: 0;
   margin-bottom: 0.5rem;
+}
+
+.method-card:hover {
+  border: 2px solid #e14667; 
+
 }

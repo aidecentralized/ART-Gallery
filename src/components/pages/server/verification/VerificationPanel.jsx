@@ -15,6 +15,7 @@ const VerificationPanel = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Verification Method:", verificationMethod); // Debugging the selected method
     setIsSubmitting(true);
     setError(null);
 
@@ -131,7 +132,10 @@ const VerificationPanel = ({
             <select
               id="verificationMethod"
               value={verificationMethod}
-              onChange={(e) => setVerificationMethod(e.target.value)}
+              oonChange={(e) => {
+                console.log("Selected verification method:", e.target.value); // Debugging line
+                setVerificationMethod(e.target.value);
+              }}
               className="method-select"
             >
               <option value="dns">DNS Verification</option>
