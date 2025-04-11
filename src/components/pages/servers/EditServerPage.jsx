@@ -1,21 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { serverApi } from "../../../api";
 import { useAuth } from "../../../context/AuthContext";
 import "../registry/RegistryPage.css";
+
+// Create a global variable to store the server data as a last resort fallback
+window.CURRENT_SERVER_DATA = null;
 
 const EditServerPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { serverId } = useParams();
-  const [activeStep, setActiveStep] = useState(1);
+  const location = useLocation();
+  
+  // Debug serverId and location
+  console.log("EditServerPage - Debug Info:", {
+    serverId,
+    pathname: location.pathname,
+    search: location.search,
+    hash: location.hash
+  });
+  
+  // Redirect if serverId is missing
+  useEffect(() => {
+    if (!serverId) {
+      console.error("Server ID is missing, redirecting to dashboard");
+      setError("Missing server ID. Redirecting to dashboard...");
+      
+      // Wait a moment before redirecting to show the error
+      setTimeout(() => {
+        navigate("/dashboard/servers");
+      }, 2000);
+    }
+  }, [serverId, navigate]);
+  
+  // Loading and UI states
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
-  // Server form state
-  const [serverData, setServerData] = useState({
+  const [tagInput, setTagInput] = useState("");
+  const [errors, setErrors] = useState({});
+  
+  // Server data state - this will be populated from the API
+  const [initialData, setInitialData] = useState(null);
+  const [formData, setFormData] = useState({
     name: "",
     slug: "",
     description: "",
@@ -26,7 +55,6 @@ const EditServerPage = () => {
     tags: [],
     logo: null,
     contact_email: "",
-    capabilities: [],
     usage_requirements: {
       authentication_required: false,
       authentication_type: "none",
@@ -35,52 +63,64 @@ const EditServerPage = () => {
     },
   });
 
-  // Original server data for comparison
-  const [originalData, setOriginalData] = useState(null);
-
-  // Tag input state
-  const [tagInput, setTagInput] = useState("");
-
-  // Validation state
-  const [errors, setErrors] = useState({});
-
-  // Fetch server data
+  // Fetch server data on component mount
   useEffect(() => {
-    const fetchServerData = async () => {
+    async function fetchData() {
+      if (!serverId) {
+        console.error("Server ID is undefined, cannot fetch data");
+        setError("Missing server ID. Please return to your servers list and try again.");
+        setFetching(false);
+        return;
+      }
+      
+      if (!isAuthenticated) {
+        return;
+      }
+      
       setFetching(true);
+      setError(null);
+      
       try {
+        console.log(`Fetching server data for ID: ${serverId}`);
         const response = await serverApi.getServer(serverId);
         const serverData = response.data;
         
-        // Format data for the form
+        console.log("✅ Server data received:", serverData);
+        
+        // Store the raw server data for comparison when saving
+        setInitialData(serverData);
+        
+        // Format and set form data
         const formattedData = {
-          ...serverData,
-          logo: serverData.logo || null,
+          name: serverData.name || "",
+          slug: serverData.slug || "",
+          description: serverData.description || "",
+          provider: serverData.provider || "",
+          url: serverData.url || "",
+          documentation_url: serverData.documentation_url || "",
+          contact_email: serverData.owner_email || serverData.contact_email || "",
+          logo: serverData.logo_url || serverData.logo || null,
           types: serverData.types || [],
           tags: serverData.tags || [],
-          capabilities: serverData.capabilities || [],
           usage_requirements: {
-            authentication_required: serverData.usage_requirements?.authentication_required || false,
+            authentication_required: Boolean(serverData.usage_requirements?.authentication_required),
             authentication_type: serverData.usage_requirements?.authentication_type || "none",
             rate_limits: serverData.usage_requirements?.rate_limits || "",
-            pricing: serverData.usage_requirements?.pricing || "",
+            pricing: serverData.usage_requirements?.pricing || ""
           },
         };
         
-        setServerData(formattedData);
-        setOriginalData(formattedData);
-        setError(null);
+        console.log("Form data set to:", formattedData);
+        setFormData(formattedData);
       } catch (err) {
         console.error("Failed to fetch server data:", err);
-        setError("Failed to load server data. Please try again.");
+        setError("Could not load server data. Please try again or contact support.");
       } finally {
         setFetching(false);
       }
-    };
-
-    if (serverId && isAuthenticated) {
-      fetchServerData();
     }
+    
+    fetchData();
   }, [serverId, isAuthenticated]);
 
   // Redirect if not logged in
@@ -90,7 +130,7 @@ const EditServerPage = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Handle input changes
+  // Handle input changes for text fields
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -98,15 +138,15 @@ const EditServerPage = () => {
       if (name.startsWith("type_")) {
         const serverType = name.replace("type_", "");
         const updatedTypes = checked
-          ? [...serverData.types, serverType]
-          : serverData.types.filter((type) => type !== serverType);
+          ? [...formData.types, serverType]
+          : formData.types.filter((type) => type !== serverType);
 
-        setServerData((prev) => ({
+        setFormData((prev) => ({
           ...prev,
           types: updatedTypes,
         }));
-      } else if (name.startsWith("auth_required")) {
-        setServerData((prev) => ({
+      } else if (name === "auth_required") {
+        setFormData((prev) => ({
           ...prev,
           usage_requirements: {
             ...prev.usage_requirements,
@@ -115,18 +155,29 @@ const EditServerPage = () => {
         }));
       }
     } else {
-      setServerData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      // For regular text fields
+      const nameParts = name.split('.');
+      
+      if (nameParts.length === 1) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      } else if (nameParts.length === 2 && nameParts[0] === 'usage_requirements') {
+        // Handle nested usage_requirements fields
+        setFormData((prev) => ({
+          ...prev,
+          usage_requirements: {
+            ...prev.usage_requirements,
+            [nameParts[1]]: value,
+          },
+        }));
+      }
     }
 
     // Clear error for this field if it exists
     if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
@@ -151,7 +202,7 @@ const EditServerPage = () => {
         return;
       }
 
-      setServerData((prev) => ({
+      setFormData((prev) => ({
         ...prev,
         logo: file,
       }));
@@ -178,8 +229,8 @@ const EditServerPage = () => {
 
       const newTag = tagInput.trim().toLowerCase().replace(/\s+/g, "-");
 
-      if (!serverData.tags.includes(newTag)) {
-        setServerData((prev) => ({
+      if (!formData.tags.includes(newTag)) {
+        setFormData((prev) => ({
           ...prev,
           tags: [...prev.tags, newTag],
         }));
@@ -191,66 +242,55 @@ const EditServerPage = () => {
 
   // Remove a tag
   const removeTag = (tagToRemove) => {
-    setServerData((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
-  // Handle authentication type change
-  const handleAuthTypeChange = (e) => {
-    setServerData((prev) => ({
-      ...prev,
-      usage_requirements: {
-        ...prev.usage_requirements,
-        authentication_type: e.target.value,
-      },
-    }));
-  };
-
-  // Validate form fields
+  // Validate form
   const validateForm = () => {
     const newErrors = {};
 
-    if (!serverData.name.trim()) {
+    if (!formData.name.trim()) {
       newErrors.name = "Server name is required";
     }
 
-    if (!serverData.slug.trim()) {
+    if (!formData.slug.trim()) {
       newErrors.slug = "Server slug is required";
-    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(serverData.slug)) {
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
       newErrors.slug =
         "Slug must contain only lowercase letters, numbers, and hyphens";
     }
 
-    if (!serverData.description.trim()) {
+    if (!formData.description.trim()) {
       newErrors.description = "Server description is required";
     }
 
-    if (!serverData.provider.trim()) {
+    if (!formData.provider.trim()) {
       newErrors.provider = "Provider name is required";
     }
 
-    if (!serverData.url.trim()) {
+    if (!formData.url.trim()) {
       newErrors.url = "Server URL is required";
-    } else if (!isValidUrl(serverData.url)) {
+    } else if (!isValidUrl(formData.url)) {
       newErrors.url = "Please enter a valid URL";
     }
 
     if (
-      serverData.documentation_url &&
-      !isValidUrl(serverData.documentation_url)
+      formData.documentation_url &&
+      !isValidUrl(formData.documentation_url)
     ) {
       newErrors.documentation_url = "Please enter a valid URL";
     }
 
-    if (serverData.types.length === 0) {
+    if (formData.types.length === 0) {
       newErrors.types = "Please select at least one server type";
     }
 
-    if (!serverData.contact_email.trim()) {
+    if (!formData.contact_email.trim()) {
       newErrors.contact_email = "Contact email is required";
-    } else if (!isValidEmail(serverData.contact_email)) {
+    } else if (!isValidEmail(formData.contact_email)) {
       newErrors.contact_email = "Please enter a valid email address";
     }
 
@@ -258,10 +298,15 @@ const EditServerPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
+  // Form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
+      return;
+    }
+
+    if (!serverId) {
+      setError("Missing server ID. Cannot update server.");
       return;
     }
 
@@ -270,61 +315,125 @@ const EditServerPage = () => {
     setError(null);
 
     try {
-      // Sanitize data before sending to API
-      const sanitizedData = {
-        ...serverData,
-        name: serverData.name.trim(),
-        slug: serverData.slug.trim(),
-        description: serverData.description.trim(),
-        provider: serverData.provider.trim(),
-        url: serverData.url.trim(),
-        documentation_url: serverData.documentation_url.trim() || undefined,
-        contact_email: serverData.contact_email.trim(),
-        // Only include logo if it's a File object (has been changed)
-        logo: serverData.logo instanceof File ? serverData.logo : undefined,
-        // Ensure types is an array with at least one value
-        types: serverData.types.length ? serverData.types : ["agent"],
-        // Ensure tags is always an array
-        tags: serverData.tags || [],
-      };
-
+      // Create payload with only changed fields
+      const sanitizedData = {};
+      
+      // No need to compare with original data if it's not available
+      if (!initialData) {
+        setError("Cannot update server: original data not loaded.");
+        setLoading(false);
+        return;
+      }
+      
+      // Compare with original data and only include changed fields
+      if (formData.name !== initialData.name) sanitizedData.name = formData.name.trim();
+      if (formData.slug !== initialData.slug) sanitizedData.slug = formData.slug.trim();
+      if (formData.description !== initialData.description) sanitizedData.description = formData.description.trim();
+      if (formData.provider !== initialData.provider) sanitizedData.provider = formData.provider.trim();
+      if (formData.url !== initialData.url) sanitizedData.url = formData.url.trim();
+      
+      if (formData.documentation_url !== initialData.documentation_url) {
+        sanitizedData.documentation_url = formData.documentation_url.trim() || null;
+      }
+      
+      if (formData.contact_email !== (initialData.owner_email || initialData.contact_email)) {
+        sanitizedData.contact_email = formData.contact_email.trim();
+      }
+      
+      // Handle arrays
+      if (JSON.stringify(formData.types) !== JSON.stringify(initialData.types)) {
+        sanitizedData.types = formData.types.length ? formData.types : ["agent"];
+      }
+      
+      if (JSON.stringify(formData.tags) !== JSON.stringify(initialData.tags)) {
+        sanitizedData.tags = formData.tags || [];
+      }
+      
+      // Handle nested usage_requirements
+      const oldUsageReq = initialData.usage_requirements || {};
+      const usageReqChanged = 
+        formData.usage_requirements.authentication_required !== Boolean(oldUsageReq.authentication_required) ||
+        formData.usage_requirements.authentication_type !== oldUsageReq.authentication_type ||
+        formData.usage_requirements.rate_limits !== oldUsageReq.rate_limits ||
+        formData.usage_requirements.pricing !== oldUsageReq.pricing;
+      
+      if (usageReqChanged) {
+        sanitizedData.usage_requirements = {
+          authentication_required: Boolean(formData.usage_requirements.authentication_required),
+          authentication_type: formData.usage_requirements.authentication_type || "none",
+          rate_limits: formData.usage_requirements.rate_limits?.trim() || "",
+          pricing: formData.usage_requirements.pricing?.trim() || ""
+        };
+      }
+      
+      // Only include logo if it's a File object (has been changed)
+      if (formData.logo instanceof File) {
+        sanitizedData.logo = formData.logo;
+      }
+      
+      // Only proceed if there are changes to submit
+      if (Object.keys(sanitizedData).length === 0) {
+        setSaveSuccess(true);
+        setTimeout(() => {
+          setSaveSuccess(false);
+        }, 3000);
+        setLoading(false);
+        return;
+      }
+      
+      console.log("Updating server with:", sanitizedData);
+      
+      // Make the API call
       await serverApi.updateServer(serverId, sanitizedData);
+      
+      // Show success message
       setSaveSuccess(true);
+      
+      // Refresh the data
+      const response = await serverApi.getServer(serverId);
+      const updatedServerData = response.data;
+      
+      // Update initial data
+      setInitialData(updatedServerData);
+      
+      // Update form data
+      setFormData({
+        name: updatedServerData.name || "",
+        slug: updatedServerData.slug || "",
+        description: updatedServerData.description || "",
+        provider: updatedServerData.provider || "",
+        url: updatedServerData.url || "",
+        documentation_url: updatedServerData.documentation_url || "",
+        contact_email: updatedServerData.owner_email || updatedServerData.contact_email || "",
+        logo: updatedServerData.logo_url || updatedServerData.logo || null,
+        types: updatedServerData.types || [],
+        tags: updatedServerData.tags || [],
+        usage_requirements: {
+          authentication_required: Boolean(updatedServerData.usage_requirements?.authentication_required),
+          authentication_type: updatedServerData.usage_requirements?.authentication_type || "none",
+          rate_limits: updatedServerData.usage_requirements?.rate_limits || "",
+          pricing: updatedServerData.usage_requirements?.pricing || ""
+        },
+      });
       
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSaveSuccess(false);
       }, 3000);
+      
     } catch (err) {
       console.error("Failed to update server:", err);
-      
-      // Handle validation errors from the API
-      if (err.response?.data) {
-        const apiErrors = {};
-        // Format API errors into our errors object
-        Object.entries(err.response.data).forEach(([key, value]) => {
-          apiErrors[key] = Array.isArray(value) ? value[0] : value;
-        });
-        
-        if (Object.keys(apiErrors).length > 0) {
-          setErrors(apiErrors);
-        } else {
-          setError("Failed to update server. Please try again.");
-        }
-      } else {
-        setError("Failed to update server. Please try again.");
-      }
+      setError("Failed to update server. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper function to validate email
+  // Helper functions
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  // Helper function to validate URL
   const isValidUrl = (url) => {
     try {
       new URL(url);
@@ -334,34 +443,30 @@ const EditServerPage = () => {
     }
   };
 
-  if (fetching) {
-    return (
-      <div className="registry-container">
-        <div className="container">
-          <div className="enhanced-loading-indicator">
-            <div className="loading-spinner-container">
-              <div className="enhanced-loading-spinner"></div>
-            </div>
-            <h2 className="loading-title">Loading Server</h2>
-            <p className="loading-description">Retrieving server data from the MCP Nexus...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // For debugging
+  console.log("RENDER STATE:", {
+    fetching,
+    formData,
+    initialData,
+    isAuthenticated
+  });
 
   return (
     <div className="registry-container">
       <div className="container">
         <div className="registry-header">
           <h1>Edit MCP Server</h1>
-          <p>Update your server details in the MCP Nexus registry.</p>
+          <p>Update your server details in the NANDA registry.</p>
+          {initialData && (
+            <div className="debug-info" style={{background: '#333', padding: '10px', marginTop: '10px', borderRadius: '5px'}}>
+              <strong>Server: {initialData.name}</strong>
+            </div>
+          )}
         </div>
 
         {error && <div className="message error">{error}</div>}
-        {saveSuccess && (
-          <div className="message success">Server updated successfully!</div>
-        )}
+        {saveSuccess && <div className="message success">Server updated successfully!</div>}
+        {fetching && <div className="message info">Loading server data...</div>}
 
         <div className="registry-form-container">
           <form className="registry-form" onSubmit={handleSubmit}>
@@ -374,13 +479,13 @@ const EditServerPage = () => {
                   type="text"
                   id="name"
                   name="name"
-                  value={serverData.name}
+                  value={formData.name}
                   onChange={handleChange}
                   className={errors.name ? "error" : ""}
+                  placeholder="e.g., DataAnalyzer Pro"
+                  disabled={fetching}
                 />
-                {errors.name && (
-                  <div className="error-message">{errors.name}</div>
-                )}
+                {errors.name && <div className="error-message">{errors.name}</div>}
               </div>
 
               <div className="form-group">
@@ -389,13 +494,13 @@ const EditServerPage = () => {
                   type="text"
                   id="slug"
                   name="slug"
-                  value={serverData.slug}
+                  value={formData.slug}
                   onChange={handleChange}
                   className={errors.slug ? "error" : ""}
+                  placeholder="e.g., data-analyzer-pro"
+                  disabled={fetching}
                 />
-                {errors.slug && (
-                  <div className="error-message">{errors.slug}</div>
-                )}
+                {errors.slug && <div className="error-message">{errors.slug}</div>}
                 <div className="input-description">
                   The slug is used in the URL for your server and must be unique.
                 </div>
@@ -406,14 +511,14 @@ const EditServerPage = () => {
                 <textarea
                   id="description"
                   name="description"
-                  value={serverData.description}
+                  value={formData.description}
                   onChange={handleChange}
                   rows="4"
                   className={errors.description ? "error" : ""}
+                  placeholder="e.g., A powerful data analysis tool"
+                  disabled={fetching}
                 ></textarea>
-                {errors.description && (
-                  <div className="error-message">{errors.description}</div>
-                )}
+                {errors.description && <div className="error-message">{errors.description}</div>}
               </div>
 
               <div className="form-group">
@@ -422,13 +527,13 @@ const EditServerPage = () => {
                   type="text"
                   id="provider"
                   name="provider"
-                  value={serverData.provider}
+                  value={formData.provider}
                   onChange={handleChange}
                   className={errors.provider ? "error" : ""}
+                  placeholder="e.g., DataAnalyzer Inc."
+                  disabled={fetching}
                 />
-                {errors.provider && (
-                  <div className="error-message">{errors.provider}</div>
-                )}
+                {errors.provider && <div className="error-message">{errors.provider}</div>}
               </div>
 
               <div className="form-group">
@@ -437,10 +542,11 @@ const EditServerPage = () => {
                   type="url"
                   id="url"
                   name="url"
-                  value={serverData.url}
+                  value={formData.url}
                   onChange={handleChange}
                   className={errors.url ? "error" : ""}
                   placeholder="https://example.com/api/mcp"
+                  disabled={fetching}
                 />
                 {errors.url && <div className="error-message">{errors.url}</div>}
               </div>
@@ -451,15 +557,14 @@ const EditServerPage = () => {
                   type="url"
                   id="documentation_url"
                   name="documentation_url"
-                  value={serverData.documentation_url}
+                  value={formData.documentation_url}
                   onChange={handleChange}
                   className={errors.documentation_url ? "error" : ""}
                   placeholder="https://example.com/docs"
+                  disabled={fetching}
                 />
                 {errors.documentation_url && (
-                  <div className="error-message">
-                    {errors.documentation_url}
-                  </div>
+                  <div className="error-message">{errors.documentation_url}</div>
                 )}
               </div>
 
@@ -471,8 +576,9 @@ const EditServerPage = () => {
                       type="checkbox"
                       id="type_agent"
                       name="type_agent"
-                      checked={serverData.types.includes("agent")}
+                      checked={formData.types.includes("agent")}
                       onChange={handleChange}
+                      disabled={fetching}
                     />
                     <label htmlFor="type_agent">ART Agent</label>
                   </div>
@@ -481,8 +587,9 @@ const EditServerPage = () => {
                       type="checkbox"
                       id="type_model"
                       name="type_model"
-                      checked={serverData.types.includes("model")}
+                      checked={formData.types.includes("model")}
                       onChange={handleChange}
+                      disabled={fetching}
                     />
                     <label htmlFor="type_model">Foundation Model</label>
                   </div>
@@ -491,8 +598,9 @@ const EditServerPage = () => {
                       type="checkbox"
                       id="type_tool"
                       name="type_tool"
-                      checked={serverData.types.includes("tool")}
+                      checked={formData.types.includes("tool")}
                       onChange={handleChange}
+                      disabled={fetching}
                     />
                     <label htmlFor="type_tool">Tool Provider</label>
                   </div>
@@ -501,15 +609,14 @@ const EditServerPage = () => {
                       type="checkbox"
                       id="type_other"
                       name="type_other"
-                      checked={serverData.types.includes("other")}
+                      checked={formData.types.includes("other")}
                       onChange={handleChange}
+                      disabled={fetching}
                     />
                     <label htmlFor="type_other">Other</label>
                   </div>
                 </div>
-                {errors.types && (
-                  <div className="error-message">{errors.types}</div>
-                )}
+                {errors.types && <div className="error-message">{errors.types}</div>}
               </div>
 
               <div className="form-group">
@@ -524,9 +631,10 @@ const EditServerPage = () => {
                     onBlur={addTag}
                     placeholder="Add a tag and press Enter"
                     className="tag-input"
+                    disabled={fetching}
                   />
                   <div className="tags-list">
-                    {serverData.tags.map((tag) => (
+                    {formData.tags.map((tag) => (
                       <div className="tag" key={tag}>
                         <span>{tag}</span>
                         <button
@@ -534,6 +642,7 @@ const EditServerPage = () => {
                           className="remove-tag"
                           onClick={() => removeTag(tag)}
                           aria-label={`Remove tag ${tag}`}
+                          disabled={fetching}
                         >
                           &times;
                         </button>
@@ -555,16 +664,17 @@ const EditServerPage = () => {
                   onChange={handleLogoUpload}
                   accept="image/jpeg,image/png,image/svg+xml"
                   className={errors.logo ? "error" : ""}
+                  disabled={fetching}
                 />
                 {errors.logo && <div className="error-message">{errors.logo}</div>}
                 <div className="input-description">
                   Maximum file size: 1MB. Accepted formats: JPG, PNG, SVG.
                 </div>
-                {serverData.logo && typeof serverData.logo === 'string' && (
+                {typeof formData.logo === 'string' && (
                   <div className="current-logo">
                     <p>Current logo:</p>
                     <img 
-                      src={serverData.logo} 
+                      src={formData.logo} 
                       alt="Current server logo" 
                       style={{ maxWidth: '200px', maxHeight: '100px' }} 
                     />
@@ -578,9 +688,11 @@ const EditServerPage = () => {
                   type="email"
                   id="contact_email"
                   name="contact_email"
-                  value={serverData.contact_email}
+                  value={formData.contact_email}
                   onChange={handleChange}
                   className={errors.contact_email ? "error" : ""}
+                  placeholder="e.g., info@dataanalyzer.com"
+                  disabled={fetching}
                 />
                 {errors.contact_email && (
                   <div className="error-message">{errors.contact_email}</div>
@@ -597,8 +709,9 @@ const EditServerPage = () => {
                     type="checkbox"
                     id="auth_required"
                     name="auth_required"
-                    checked={serverData.usage_requirements.authentication_required}
+                    checked={formData.usage_requirements.authentication_required}
                     onChange={handleChange}
+                    disabled={fetching}
                   />
                   <label htmlFor="auth_required">
                     Authentication Required
@@ -606,15 +719,17 @@ const EditServerPage = () => {
                 </div>
               </div>
 
-              {serverData.usage_requirements.authentication_required && (
+              {formData.usage_requirements.authentication_required && (
                 <div className="form-group">
                   <label htmlFor="authentication_type">
                     Authentication Type
                   </label>
                   <select
                     id="authentication_type"
-                    value={serverData.usage_requirements.authentication_type}
-                    onChange={handleAuthTypeChange}
+                    name="usage_requirements.authentication_type"
+                    value={formData.usage_requirements.authentication_type}
+                    onChange={handleChange}
+                    disabled={fetching}
                   >
                     <option value="none">None</option>
                     <option value="api_key">API Key</option>
@@ -630,19 +745,12 @@ const EditServerPage = () => {
                 <label htmlFor="rate_limits">Rate Limits</label>
                 <textarea
                   id="rate_limits"
-                  name="rate_limits"
-                  value={serverData.usage_requirements.rate_limits}
-                  onChange={(e) =>
-                    setServerData((prev) => ({
-                      ...prev,
-                      usage_requirements: {
-                        ...prev.usage_requirements,
-                        rate_limits: e.target.value,
-                      },
-                    }))
-                  }
+                  name="usage_requirements.rate_limits"
+                  value={formData.usage_requirements.rate_limits}
+                  onChange={handleChange}
                   rows="3"
                   placeholder="Describe any rate limits that apply to your server"
+                  disabled={fetching}
                 ></textarea>
               </div>
 
@@ -650,19 +758,12 @@ const EditServerPage = () => {
                 <label htmlFor="pricing">Pricing</label>
                 <textarea
                   id="pricing"
-                  name="pricing"
-                  value={serverData.usage_requirements.pricing}
-                  onChange={(e) =>
-                    setServerData((prev) => ({
-                      ...prev,
-                      usage_requirements: {
-                        ...prev.usage_requirements,
-                        pricing: e.target.value,
-                      },
-                    }))
-                  }
+                  name="usage_requirements.pricing"
+                  value={formData.usage_requirements.pricing}
+                  onChange={handleChange}
                   rows="3"
                   placeholder="Describe your pricing model or any costs associated with using your server"
+                  disabled={fetching}
                 ></textarea>
               </div>
             </div>
@@ -672,13 +773,14 @@ const EditServerPage = () => {
                 type="button"
                 className="btn btn-outline"
                 onClick={() => navigate(-1)}
+                disabled={loading || fetching}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={loading}
+                disabled={loading || fetching}
               >
                 {loading ? "Saving..." : "Save Changes"}
               </button>
