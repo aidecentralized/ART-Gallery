@@ -9,21 +9,21 @@ window.CURRENT_SERVER_DATA = null;
 
 const EditServerPage = () => {
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const { serverId } = useParams();
+  const navigate = useNavigate(); 
+  const { id } = useParams();
   const location = useLocation();
   
   // Debug serverId and location
   console.log("EditServerPage - Debug Info:", {
-    serverId,
+    id,
     pathname: location.pathname,
     search: location.search,
     hash: location.hash
   });
   
-  // Redirect if serverId is missing
+  // Redirect if id is missing
   useEffect(() => {
-    if (!serverId) {
+    if (!id) {
       console.error("Server ID is missing, redirecting to dashboard");
       setError("Missing server ID. Redirecting to dashboard...");
       
@@ -32,7 +32,7 @@ const EditServerPage = () => {
         navigate("/dashboard/servers");
       }, 2000);
     }
-  }, [serverId, navigate]);
+  }, [id, navigate]);
   
   // Loading and UI states
   const [loading, setLoading] = useState(false);
@@ -66,7 +66,7 @@ const EditServerPage = () => {
   // Fetch server data on component mount
   useEffect(() => {
     async function fetchData() {
-      if (!serverId) {
+      if (!id) {
         console.error("Server ID is undefined, cannot fetch data");
         setError("Missing server ID. Please return to your servers list and try again.");
         setFetching(false);
@@ -81,8 +81,8 @@ const EditServerPage = () => {
       setError(null);
       
       try {
-        console.log(`Fetching server data for ID: ${serverId}`);
-        const response = await serverApi.getServer(serverId);
+        console.log(`Fetching server data for ID: ${id}`);
+        const response = await serverApi.getServer(id);
         const serverData = response.data;
         
         console.log("✅ Server data received:", serverData);
@@ -121,7 +121,7 @@ const EditServerPage = () => {
     }
     
     fetchData();
-  }, [serverId, isAuthenticated]);
+  }, [id, isAuthenticated]);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -305,7 +305,7 @@ const EditServerPage = () => {
       return;
     }
 
-    if (!serverId) {
+    if (!id) {
       setError("Missing server ID. Cannot update server.");
       return;
     }
@@ -384,13 +384,13 @@ const EditServerPage = () => {
       console.log("Updating server with:", sanitizedData);
       
       // Make the API call
-      await serverApi.updateServer(serverId, sanitizedData);
+      await serverApi.updateServer(id, sanitizedData);
       
       // Show success message
       setSaveSuccess(true);
       
       // Refresh the data
-      const response = await serverApi.getServer(serverId);
+      const response = await serverApi.getServer(id);
       const updatedServerData = response.data;
       
       // Update initial data
