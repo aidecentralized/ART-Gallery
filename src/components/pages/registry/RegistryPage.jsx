@@ -1,8 +1,7 @@
 // src/components/pages/registry/RegistryPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { serverApi, verificationApi } from "../../../api";
-import { v4 as uuidv4 } from 'uuid';
+import { serverApi } from "../../../api";
 import { useAuth } from "../../../context/AuthContext";
 import "./RegistryPage.css";
 
@@ -12,8 +11,6 @@ const RegistryPage = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedMethod, setSelectedMethod] = useState("dns"); 
-
 
   // Server form state
   const [serverData, setServerData] = useState({
@@ -442,9 +439,9 @@ const RegistryPage = () => {
         return renderBasicInfoStep();
       case 2:
         return renderARTConfigStep();
+      // case 3:
+      //   return renderVerificationStep();
       case 3:
-        return renderVerificationStep();
-      case 4:
         return renderReviewStep();
       default:
         return renderBasicInfoStep();
@@ -890,36 +887,15 @@ const RegistryPage = () => {
             Back to Basic Information
           </button>
           <button className="btn btn-primary btn-lg" onClick={nextStep}>
-            Continue to Verification
+            Review
           </button>
         </div>
       </div>
     );
   };
 
+  // Verification step
   const renderVerificationStep = () => {
-    const verification_id = uuidv4();
-    const handleVerificationMethodChange = async (selectedMethod) => {
-      console.log("Selected verification method:", selectedMethod);
-  
-    
-      setSelectedMethod(selectedMethod);
-      
-      try {
-      
-        const response = await verificationApi.completeVerification({
-          verification_id,
-          verification_method: selectedMethod,
-         
-        });
-        console.log("Verification updated:", response.data);
-
-      } catch (err) {
-        console.error("Verification API error:", err);
-        setError("Failed to update verification method");
-      }
-    };
-  
     return (
       <div className="card">
         <div className="card-header">
@@ -936,48 +912,83 @@ const RegistryPage = () => {
               meets the MCP protocol standards. Verified servers receive a badge
               and rank higher in search results.
             </p>
-  
+
             <div className="verification-methods">
               <h3>Verification Methods</h3>
               <p>
                 After registration, you can verify your server using one of
                 these methods:
               </p>
-  
+
               <div className="method-cards">
-                {/* Your verification method options */}
-                <div className="method-card" onClick={() => handleVerificationMethodChange("dns")}
-                style={{ cursor: "pointer", border: selectedMethod === "dns" ? "2px solid #e14667" : "none",}}>
+                <div className="method-card">
                   <div className="method-icon">
-                    {/* Add appropriate SVG here */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
                   </div>
-                  
                   <h4>DNS Verification</h4>
                   <p>Add a TXT record to your domain to prove ownership</p>
                 </div>
-  
-                <div className="method-card" onClick={() => handleVerificationMethodChange("file")}
-                style={{ cursor: "pointer", border: selectedMethod === "file" ? "2px solid #e14667" : "none",}}
-              >
+
+                <div className="method-card">
                   <div className="method-icon">
-                    {/* Add appropriate SVG here */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
                   </div>
                   <h4>File Verification</h4>
                   <p>Upload a verification file to your server</p>
                 </div>
-  
-                <div className="method-card" onClick={() => handleVerificationMethodChange("meta_tag")}
-                style={{ cursor: "pointer", border: selectedMethod === "meta_tag" ? "2px solid #e14667" : "none",}}
-              >
+
+                <div className="method-card">
                   <div className="method-icon">
-                    {/* Add appropriate SVG here */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
                   </div>
                   <h4>Meta Tag Verification</h4>
                   <p>Add a meta tag to your server's homepage</p>
                 </div>
               </div>
             </div>
-  
+
             <div className="verification-checks">
               <h3>What We Verify</h3>
               <ul className="check-list">
@@ -1064,7 +1075,6 @@ const RegistryPage = () => {
       </div>
     );
   };
-  
 
   // Review step
   const renderReviewStep = () => {
@@ -1225,7 +1235,7 @@ const RegistryPage = () => {
         </div>
         <div className="card-footer">
           <button className="btn btn-outline" onClick={prevStep}>
-            Back to Verification
+            Back to ART Configuration
           </button>
           <button
             className="btn btn-primary btn-lg"
@@ -1272,7 +1282,7 @@ const RegistryPage = () => {
                 </div>
               </div>
             </div>
-            <div className={`step ${activeStep >= 3 ? "active" : ""}`}>
+            {/* <div className={`step ${activeStep >= 3 ? "active" : ""}`}>
               <div className="step-number">3</div>
               <div className="step-content">
                 <div className="step-title">Verification</div>
@@ -1280,9 +1290,9 @@ const RegistryPage = () => {
                   Prove ownership and functionality
                 </div>
               </div>
-            </div>
-            <div className={`step ${activeStep >= 4 ? "active" : ""}`}>
-              <div className="step-number">4</div>
+            </div> */}
+            <div className={`step ${activeStep >= 3 ? "active" : ""}`}>
+              <div className="step-number">3</div>
               <div className="step-content">
                 <div className="step-title">Review & Submit</div>
                 <div className="step-description">
