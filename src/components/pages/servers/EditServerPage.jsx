@@ -318,6 +318,7 @@ const EditServerPage = () => {
       // Create payload with only changed fields
       const sanitizedData = {};
       
+      
       // No need to compare with original data if it's not available
       if (!initialData) {
         setError("Cannot update server: original data not loaded.");
@@ -388,6 +389,7 @@ const EditServerPage = () => {
       
       // Show success message
       setSaveSuccess(true);
+  
       
       // Refresh the data
       const response = await serverApi.getServer(id);
@@ -415,6 +417,9 @@ const EditServerPage = () => {
           pricing: updatedServerData.usage_requirements?.pricing || ""
         },
       });
+
+      // Navigate back to previous page 
+      navigate(-1);
       
       // Clear success message after 3 seconds
       setTimeout(() => {

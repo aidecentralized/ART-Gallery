@@ -346,6 +346,7 @@ const RegistryPage = () => {
       console.log("Server registration successful:", response.data);
       
       // Show success message
+      // Show success message
       const successMessage = document.createElement('div');
       successMessage.className = 'success-overlay';
       successMessage.innerHTML = `
@@ -357,11 +358,13 @@ const RegistryPage = () => {
         </div>
       `;
       document.body.appendChild(successMessage);
-      
-      // Redirect to the dashboard after a short delay
+
+      // Auto-remove message and redirect
       setTimeout(() => {
+        document.body.removeChild(successMessage); // Remove the overlay 
         navigate('/dashboard/servers');
       }, 2000);
+
     } catch (err) {
       console.error("Server registration failed:", err);
       
