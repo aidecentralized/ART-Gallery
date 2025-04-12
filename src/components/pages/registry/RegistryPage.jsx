@@ -434,9 +434,9 @@ const RegistryPage = () => {
         return renderBasicInfoStep();
       case 2:
         return renderARTConfigStep();
+      // case 3:
+      //   return renderVerificationStep();
       case 3:
-        return renderVerificationStep();
-      case 4:
         return renderReviewStep();
       default:
         return renderBasicInfoStep();
@@ -806,7 +806,7 @@ const RegistryPage = () => {
             Back to Basic Information
           </button>
           <button className="btn btn-primary btn-lg" onClick={nextStep}>
-            Continue to Verification
+            Review
           </button>
         </div>
       </div>
@@ -1137,7 +1137,7 @@ const RegistryPage = () => {
         </div>
         <div className="card-footer">
           <button className="btn btn-outline" onClick={prevStep}>
-            Back to Verification
+            Back to ART Configuration
           </button>
           <button
             className="btn btn-primary btn-lg"
@@ -1184,7 +1184,7 @@ const RegistryPage = () => {
                 </div>
               </div>
             </div>
-            <div className={`step ${activeStep >= 3 ? "active" : ""}`}>
+            {/* <div className={`step ${activeStep >= 3 ? "active" : ""}`}>
               <div className="step-number">3</div>
               <div className="step-content">
                 <div className="step-title">Verification</div>
@@ -1192,9 +1192,9 @@ const RegistryPage = () => {
                   Prove ownership and functionality
                 </div>
               </div>
-            </div>
-            <div className={`step ${activeStep >= 4 ? "active" : ""}`}>
-              <div className="step-number">4</div>
+            </div> */}
+            <div className={`step ${activeStep >= 3 ? "active" : ""}`}>
+              <div className="step-number">3</div>
               <div className="step-content">
                 <div className="step-title">Review & Submit</div>
                 <div className="step-description">
