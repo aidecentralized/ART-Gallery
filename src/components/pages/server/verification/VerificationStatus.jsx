@@ -2,7 +2,10 @@ import React from "react";
 import "./VerificationStatus.css";
 
 const VerificationStatus = ({ status, onClose }) => {
-  const isSuccess = status && status.server && status.server.verified;
+  const isSuccess = status && 
+    ((status.server && status.server.verified) || 
+     (status.verification_details && status.verification_details.is_verified) || 
+     (status.status === "completed"));
 
   return (
     <div className="verification-overlay">
@@ -43,37 +46,47 @@ const VerificationStatus = ({ status, onClose }) => {
                     <img src={status.badge_url} alt="Verification Badge" />
                   </div>
                   <div className="badge-code">
-                    <code>{`<img src="${status.badge_url}" alt="Verified MCP Server" />`}</code>
-                    <button
-                      className="copy-button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          `<img src="${status.badge_url}" alt="Verified MCP Server" />`
-                        );
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    <p className="badge-instruction">Add this code to your website to display your verification badge:</p>
+                    <div className="code-box">
+                      <code>{`<img src="${status.badge_url}" alt="Verified MCP Server" />`}</code>
+                      <button
+                        className="copy-button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `<img src="${status.badge_url}" alt="Verified MCP Server" />`
+                          );
+                          // Show a temporary "Copied!" message
+                          const button = document.querySelector('.badge-code .copy-button');
+                          const originalInnerHTML = button.innerHTML;
+                          button.innerHTML = '<span style="font-size: 12px;">Copied!</span>';
+                          setTimeout(() => {
+                            button.innerHTML = originalInnerHTML;
+                          }, 2000);
+                        }}
                       >
-                        <rect
-                          x="9"
-                          y="9"
-                          width="13"
-                          height="13"
-                          rx="2"
-                          ry="2"
-                        ></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                    </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect
+                            x="9"
+                            y="9"
+                            width="13"
+                            height="13"
+                            rx="2"
+                            ry="2"
+                          ></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
