@@ -103,7 +103,7 @@ const DashboardOverview = () => {
               <FaServer size={48} />
             </div>
             <h3>No servers yet</h3>
-            <p>You haven't registered any MCP servers yet.</p>
+            <p>You haven't registered any NANDA servers yet.</p>
             <button onClick={handleRegisterServer} className="btn btn-primary">
               <FaPlus /> Register Your First Server
             </button>
@@ -284,7 +284,7 @@ const UserServersPage = () => {
         </div>
       ) : (
         <div className="empty-state">
-          <p>You haven't registered any MCP servers yet.</p>
+          <p>You haven't registered any NANDA servers yet.</p>
           <NavLink to="/registry" className="btn btn-primary">
             Register Your First Server
           </NavLink>

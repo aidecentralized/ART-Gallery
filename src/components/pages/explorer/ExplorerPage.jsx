@@ -254,9 +254,9 @@ const ExplorerPage = () => {
     <div className="explorer-page">
       <div className="container">
         <div className="explorer-hero">
-          <h1 className="explorer-title">Explore MCP Servers</h1>
+          <h1 className="explorer-title">Explore NANDA Servers</h1>
           <p className="explorer-subtitle">
-            Discover Agents, Resources, and Tools in the decentralized MCP network.
+            Discover Agents, Resources, and Tools in the decentralized NANDA network.
           </p>
         </div>
 

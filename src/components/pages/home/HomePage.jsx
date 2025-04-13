@@ -281,13 +281,13 @@ const HomePage = () => {
               The Open Registry for AI Communication
             </h1>
             <p className="hero-subtitle">
-              Connect, discover, and integrate MCP servers in a truly
+              Connect, discover, and integrate NANDA servers in a truly
               decentralized network. Build the future of inter-agent
               communication without centralized gatekeepers.
             </p>
             <div className="hero-buttons">
               <Link to="/registry" className="btn btn-primary pulse-button">
-                Register Your MCP Server
+                Register Your NANDA Server
               </Link>
               <Link to="/explorer" className="btn btn-outline hover-glow">
                 Explore Registry
@@ -333,7 +333,7 @@ const HomePage = () => {
               }
               iconExtra={<polygon points="12 15 17 21 7 21 12 15"></polygon>}
               title="Decentralized Registry"
-              description="Register and discover MCP servers in a fully decentralized network. No central authority controls access or visibility."
+              description="Register and discover NANDA servers in a fully decentralized network. No central authority controls access or visibility."
             />
             <FeatureCard
               active={activeFeature === 1}
@@ -357,7 +357,7 @@ const HomePage = () => {
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
               }
               title="Security & Trust"
-              description="Built-in verification, ratings, and security monitoring for all registered MCP servers. Know what you're connecting to."
+              description="Built-in verification, ratings, and security monitoring for all registered NANDA servers. Know what you're connecting to."
             />
             <FeatureCard
               active={activeFeature === 3}
@@ -379,7 +379,7 @@ const HomePage = () => {
                 </>
               }
               title="Easy Integration"
-              description="SDK and libraries for all major languages and frameworks. Connect to any MCP server with just a few lines of code."
+              description="SDK and libraries for all major languages and frameworks. Connect to any NANDA server with just a few lines of code."
             />
             <FeatureCard
               active={activeFeature === 5}
@@ -396,9 +396,9 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="search-section slide-up">
+      {/* <section className="search-section slide-up">
         <div className="container">
-          <h2 className="section-title">Discover MCP Servers</h2>
+          <h2 className="section-title">Discover NANDA Servers</h2>
           <p className="section-subtitle">
             Search the decentralized registry for Agents, Resources, and Tools
           </p>
@@ -446,7 +446,54 @@ const HomePage = () => {
             </button>
           </div>
         </div>
+      </section> */}
+      {/* <section className="search-section slide-up">
+        <div className="container">
+          <h2 className="section-title">Discover NANDA Servers</h2>
+          <p className="section-subtitle">
+            Browse the decentralized registry for Agents, Resources, and Tools
+          </p>
+
+          <div className="explorer-link-container">
+            <a href="/explorer" className="explore-button pulse-on-hover">
+              Go to Explorer
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="arrow-icon"
+                style={{ marginLeft: '8px' }}
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section> */}
+
+
+      <section className="search-section slide-up">
+        <div className="container">
+          <h2 className="section-title">Discover NANDA Servers</h2>
+          <p className="section-subtitle">
+            Browse the decentralized registry for Agents, Resources, and Tools.
+          </p>
+
+          <div className="explore-button-wrapper">
+            <a href="/explorer" className="btn btn-primary explore-link pulse-on-hover">
+              Explore Now →
+            </a>
+          </div>
+        </div>
       </section>
+
+
 
       {/* Featured servers */}
       {featuredServers.length > 0 && (
