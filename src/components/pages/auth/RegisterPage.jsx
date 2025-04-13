@@ -138,7 +138,7 @@ const RegisterPage = () => {
         <div className="auth-header">
           <h1 className="auth-title">Create an Account</h1>
           <p className="auth-subtitle">
-            Join MCP Nexus to connect, discover, and register servers
+            Join NANDA to connect, discover, and register servers
           </p>
         </div>
 
@@ -289,33 +289,6 @@ const RegisterPage = () => {
           <span>or</span>
         </div>
 
-        <button className="social-auth-button google">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-          >
-            <path d="M12 0C9.62 0 7.31.92 5.5 2.75S2.75 9.62 2.75 12s.92 4.69 2.75 6.5S9.62 21.25 12 21.25s4.69-.92 6.5-2.75 2.75-4.09 2.75-6.5-.92-4.69-2.75-6.5S14.38 0 12 0zm0 21.25c-5.1 0-9.25-4.15-9.25-9.25S6.9 2.75 12 2.75s9.25 4.15 9.25 9.25-4.15 9.25-9.25 9.25z" />
-            <path
-              fill="#4285F4"
-              d="M12 4.75c1.66 0 3.14.69 4.22 1.78L19.44 3.3C17.75 1.6 15.02.5 12 .5 7.34.5 3.4 3.1 1.28 6.99l3.65 2.84c.9-2.62 3.34-4.5 6.18-4.5z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 21.5c3.02 0 5.75-1.1 7.44-2.8l-3.22-3.22c-1.08 1.09-2.56 1.78-4.22 1.78-2.84 0-5.28-1.88-6.18-4.5L2.51 15.6C4.63 19.5 8.57 21.5 12 21.5z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.82 14.76c-.21-.64-.33-1.32-.33-2.02s.12-1.38.33-2.02V7.24H2.17c-.76 1.45-1.18 3.08-1.18 4.76s.42 3.31 1.18 4.76l3.65-2z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 8.5c1.38 0 2.62.47 3.6 1.4l2.83-2.83C16.65 5.5 14.43 4.5 12 4.5c-3.43 0-6.37 2-7.82 4.9l3.65 2.84c.9-2.62 3.34-4.5 6.18-4.5z"
-            />
-          </svg>
-          Sign up with Google
-        </button>
 
         <div className="auth-footer">
           Already have an account?{" "}

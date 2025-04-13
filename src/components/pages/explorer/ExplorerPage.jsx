@@ -349,7 +349,7 @@ const ExplorerPage = () => {
             <div className="filter-group">
               <h3 className="filter-group-title">Categories</h3>
               <div className="filter-options">
-                {availableTags.slice(0, 10).map((tag, index) => (
+                {availableTags.map((tag, index) => (
                   <label key={index} className="filter-option">
                     <input
                       type="checkbox"

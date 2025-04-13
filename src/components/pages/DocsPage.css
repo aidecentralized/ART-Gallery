@@ -305,17 +305,18 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.code-block pre {
+.code-block pre,
+.code-block code {
   margin: 0;
   font-family: 'Fira Code', 'Courier New', Courier, monospace;
   font-size: 0.9rem;
   line-height: 1.6;
-  white-space: pre;
-}
-
-.code-block code {
+  white-space: pre-wrap;         
+  word-wrap: break-word;
+  overflow-x: auto;             
+  max-width: 100%;
+  box-sizing: border-box;
   color: #e5e7eb;
-  display: block;
 }
 
 .registration-steps {
@@ -625,3 +626,11 @@
 .resource-link:hover {
   background-color: #2563eb;
 } 
+
+@media (max-width: 768px) {
+  .code-block pre,
+  .code-block code {
+    font-size: 0.8rem;
+    padding: 0.75rem;
+  }
+}

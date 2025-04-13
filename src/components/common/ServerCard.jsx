@@ -67,6 +67,7 @@ const ServerCard = ({ server, compact = false }) => {
   const ratingColor = rating >= 4 ? "#4caf50" : rating >= 2.5 ? "#ff9800" : "#f44336";
 
   return (
+    <Link to={`/servers/${id}`} className="server-card-link">
     <div className={`server-card ${compact ? "compact" : ""}`}>
       <div className="server-header">
         {logo_url ? (
@@ -135,6 +136,7 @@ const ServerCard = ({ server, compact = false }) => {
         </div>
       </div>
     </div>
+    </Link>
   );
 };
 

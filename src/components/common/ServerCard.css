@@ -40,6 +40,13 @@
   padding: 1.25rem;
 }
 
+.server-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+
 .server-header {
   display: flex;
   align-items: center;
@@ -105,22 +112,29 @@
 }
 
 .server-tag {
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  font-size: 0.8rem;
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
-  color: #d0d0e0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
+  color: #ffffff !important;
+  background-color: #2a4c82 !important; 
+  border: none;
+  border-radius: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;
+  line-height: 1;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .server-tag:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background-color: #c54594 !important; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(177, 52, 130, 0.2);
 }
 
+
 .server-tag.type {
-  background: rgba(33, 150, 243, 0.15);
+  background: rgba(33, 150, 243, 0.15) !important;
   color: #64b5f6;
   border: 1px solid rgba(33, 150, 243, 0.25);
 }

@@ -495,14 +495,6 @@ const ServerDetailPage = () => {
             Overview
           </div>
           <div
-            className={`server-tab ${
-              activeTab === "capabilities" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("capabilities")}
-          >
-            Capabilities
-          </div>
-          <div
             className={`server-tab ${activeTab === "health" ? "active" : ""}`}
             onClick={() => setActiveTab("health")}
           >
