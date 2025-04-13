@@ -132,7 +132,7 @@ const MainLayout = () => {
                 </div>
               ) : (
                 <div className="auth-buttons">
-                  <Link to="/login" className="btn btn-outline">
+                  <Link to="/login" className="btn btn-login">
                     Log In
                   </Link>
                   <Link to="/register" className="btn btn-primary">

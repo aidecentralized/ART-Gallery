@@ -52,7 +52,7 @@ const Header = () => {
             Sign In
           </Link>
           <Link to="/registry" className="btn btn-primary">
-            Register MCP Server
+            Register NANDA Server
           </Link>
         </div>
       </div>

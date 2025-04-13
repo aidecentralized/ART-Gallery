@@ -396,87 +396,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* <section className="search-section slide-up">
-        <div className="container">
-          <h2 className="section-title">Discover NANDA Servers</h2>
-          <p className="section-subtitle">
-            Search the decentralized registry for Agents, Resources, and Tools
-          </p>
-
-          <div className="search-container glow-hover">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search for AI services, tools, or resources..."
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  window.location.href = `/explorer?q=${encodeURIComponent(
-                    e.target.value
-                  )}`;
-                }
-              }}
-            />
-            <button
-              className="search-button pulse-on-hover"
-              onClick={() => {
-                const input = document.querySelector(".search-input");
-                if (input && input.value) {
-                  window.location.href = `/explorer?q=${encodeURIComponent(
-                    input.value
-                  )}`;
-                } else {
-                  window.location.href = "/explorer";
-                }
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </section> */}
-      {/* <section className="search-section slide-up">
-        <div className="container">
-          <h2 className="section-title">Discover NANDA Servers</h2>
-          <p className="section-subtitle">
-            Browse the decentralized registry for Agents, Resources, and Tools
-          </p>
-
-          <div className="explorer-link-container">
-            <a href="/explorer" className="explore-button pulse-on-hover">
-              Go to Explorer
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="arrow-icon"
-                style={{ marginLeft: '8px' }}
-              >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </a>
-          </div>
-        </div>
-      </section> */}
-
 
       <section className="search-section slide-up">
         <div className="container">
@@ -501,7 +420,7 @@ const HomePage = () => {
           <div className="container">
             <h2 className="section-title">Featured Servers</h2>
             <p className="section-subtitle">
-              Popular and highly-rated MCP servers in the network
+              Popular and highly-rated NANDA servers in the network
             </p>
 
             <div className="featured-grid">
@@ -511,7 +430,7 @@ const HomePage = () => {
             </div>
 
             <div className="featured-cta">
-              <Link to="/explorer" className="btn btn-outline hover-glow">
+              <Link to="/explorer" className="btn btn-explore hover-glow">
                 Explore All Servers
               </Link>
             </div>
@@ -523,12 +442,12 @@ const HomePage = () => {
         <div className="container cta-inner">
           <h2 className="cta-title fade-in">Join the Decentralized Network Today</h2>
           <p className="cta-subtitle fade-in-delayed">
-            Be part of building a truly open AI ecosystem. Register your MCP
+            Be part of building a truly open AI ecosystem. Register your NANDA
             servers or start integrating with existing ones.
           </p>
           <div className="cta-buttons fade-in-delayed">
             <Link to="/registry" className="btn btn-white pulse-button">
-              Register MCP Server
+              Register NANDA Server
             </Link>
             <Link to="/explorer" className="btn btn-white-outline hover-glow">
               Explore Registry

@@ -218,6 +218,26 @@
   left: 100%;
 }
 
+.btn-explore {
+  background: var(--primary-light);
+  color: white;
+  padding: 0.875rem 1.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  border: none;
+  text-decoration: none;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-explore:hover {
+  background: var(--primary);
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(220, 20, 60, 0.25);
+}
+
 .user-menu {
   position: relative;
 }
